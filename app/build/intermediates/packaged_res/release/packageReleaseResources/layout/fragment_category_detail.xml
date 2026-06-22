@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:clipChildren="true"
+    android:clipToPadding="true"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:id="@+id/category_detail_header"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:paddingHorizontal="@dimen/row_padding_horizontal"
+        android:paddingTop="2dp"
+        android:paddingBottom="@dimen/category_detail_header_bottom_padding">
+
+        <TextView
+            android:id="@+id/category_detail_title"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:ellipsize="end"
+            android:includeFontPadding="false"
+            android:maxLines="1"
+            android:textAppearance="@style/TextAppearance.TvIptv.RowHeader"
+            tools:text="ARABIC | 2026 | عربي" />
+
+        <TextView
+            android:id="@+id/category_detail_count"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:includeFontPadding="false"
+            android:maxLines="1"
+            android:textAppearance="@style/TextAppearance.TvIptv.RowHeaderSubtitle"
+            tools:text="26 titles" />
+    </LinearLayout>
+
+    <androidx.leanback.widget.VerticalGridView
+        android:id="@+id/category_detail_grid"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:clipChildren="false"
+        android:clipToPadding="true"
+        android:paddingHorizontal="@dimen/row_padding_horizontal" />
+</LinearLayout>

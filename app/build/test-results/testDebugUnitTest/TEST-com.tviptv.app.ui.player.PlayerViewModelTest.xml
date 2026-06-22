@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.tviptv.app.ui.player.PlayerViewModelTest" tests="12" skipped="0" failures="0" errors="0" timestamp="2026-06-22T01:57:56" hostname="Apples-MacBook-Pro.local" time="0.062">
+  <properties/>
+  <testcase name="hasNextAndPrevious_defaultFalseForEmptyPlaylist" classname="com.tviptv.app.ui.player.PlayerViewModelTest" time="0.026"/>
+  <testcase name="onPlaybackProgress_clearsCountdownWhenSeekingBack" classname="com.tviptv.app.ui.player.PlayerViewModelTest" time="0.003"/>
+  <testcase name="onPlaybackProgress_disabledWhenPreferenceOff" classname="com.tviptv.app.ui.player.PlayerViewModelTest" time="0.004"/>
+  <testcase name="dismissAutoplay_hidesCountdown" classname="com.tviptv.app.ui.player.PlayerViewModelTest" time="0.004"/>
+  <testcase name="initializeEpisodeAutoplay_lastEpisodeHasNoNext" classname="com.tviptv.app.ui.player.PlayerViewModelTest" time="0.003"/>
+  <testcase name="initialize_loadsSavedPositionForVod" classname="com.tviptv.app.ui.player.PlayerViewModelTest" time="0.005"/>
+  <testcase name="playNextEpisodeNow_returnsNextEpisodeChannel" classname="com.tviptv.app.ui.player.PlayerViewModelTest" time="0.002"/>
+  <testcase name="initializeEpisodeAutoplay_loadsNextEpisode" classname="com.tviptv.app.ui.player.PlayerViewModelTest" time="0.004"/>
+  <testcase name="onPlaybackProgress_startsCountdownInFinalWindow" classname="com.tviptv.app.ui.player.PlayerViewModelTest" time="0.002"/>
+  <testcase name="setOverlayMode_updatesState" classname="com.tviptv.app.ui.player.PlayerViewModelTest" time="0.002"/>
+  <testcase name="savePosition_persistsToRepository" classname="com.tviptv.app.ui.player.PlayerViewModelTest" time="0.005"/>
+  <testcase name="refreshEpg_clearsStateForNonLive" classname="com.tviptv.app.ui.player.PlayerViewModelTest" time="0.002"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

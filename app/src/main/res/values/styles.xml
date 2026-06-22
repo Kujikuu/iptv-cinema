@@ -1,0 +1,188 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="TextAppearance.TvIptv" parent="@android:style/TextAppearance">
+        <item name="android:textColor">@color/on_surface</item>
+    </style>
+
+    <style name="TextAppearance.TvIptv.HeroTitle">
+        <item name="android:textSize">@dimen/hero_title_text_size</item>
+        <item name="android:textColor">@color/on_surface</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:letterSpacing">0.02</item>
+    </style>
+
+    <style name="TextAppearance.TvIptv.RowHeader">
+        <item name="android:textSize">22sp</item>
+        <item name="android:textColor">@color/on_surface</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:letterSpacing">0.02</item>
+    </style>
+
+    <style name="TextAppearance.TvIptv.RowHeaderSubtitle">
+        <item name="android:textSize">@dimen/card_subtitle_text_size</item>
+        <item name="android:textColor">@color/on_surface_secondary</item>
+    </style>
+
+    <style name="TextAppearance.TvIptv.CardTitle">
+        <item name="android:textSize">@dimen/card_title_text_size</item>
+        <item name="android:textColor">@color/on_surface</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+
+    <style name="TextAppearance.TvIptv.PosterGridTitle">
+        <item name="android:textSize">13sp</item>
+        <item name="android:textColor">@color/on_surface</item>
+        <item name="android:lineSpacingMultiplier">1.1</item>
+    </style>
+
+    <style name="TextAppearance.TvIptv.CardSubtitle">
+        <item name="android:textSize">@dimen/card_subtitle_text_size</item>
+        <item name="android:textColor">@color/on_surface_secondary</item>
+    </style>
+
+    <style name="TextAppearance.TvIptv.Badge">
+        <item name="android:textSize">@dimen/badge_text_size</item>
+        <item name="android:textColor">@color/on_surface</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+
+    <style name="TextAppearance.TvIptv.SectionTab">
+        <item name="android:textSize">@dimen/card_title_text_size</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+
+    <style name="TextAppearance.TvIptv.CategoryTitle">
+        <item name="android:textSize">15sp</item>
+        <item name="android:textColor">@color/on_surface</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:shadowColor">#CC000000</item>
+        <item name="android:shadowDx">0</item>
+        <item name="android:shadowDy">1</item>
+        <item name="android:shadowRadius">4</item>
+    </style>
+
+    <style name="TextAppearance.TvIptv.CategorySubtitle">
+        <item name="android:textSize">@dimen/card_subtitle_text_size</item>
+        <item name="android:textColor">@color/on_surface_secondary</item>
+        <item name="android:shadowColor">#99000000</item>
+        <item name="android:shadowDx">0</item>
+        <item name="android:shadowDy">1</item>
+        <item name="android:shadowRadius">3</item>
+    </style>
+
+    <style name="TextAppearance.TvIptv.HeroHint">
+        <item name="android:textSize">@dimen/card_subtitle_text_size</item>
+        <item name="android:textColor">@color/primary</item>
+    </style>
+
+    <style name="TextAppearance.TvIptv.PlayerChannelName">
+        <item name="android:textSize">24sp</item>
+        <item name="android:textColor">@color/on_surface</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+
+    <style name="TextAppearance.TvIptv.DetailsTitle">
+        <item name="android:textSize">34sp</item>
+        <item name="android:textColor">@color/on_surface</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+
+    <style name="TextAppearance.TvIptv.DetailsSubtitle">
+        <item name="android:textSize">16sp</item>
+        <item name="android:textColor">@color/on_surface_secondary</item>
+    </style>
+
+    <style name="TextAppearance.TvIptv.DetailsBody">
+        <item name="android:textSize">15sp</item>
+        <item name="android:textColor">@color/on_surface_secondary</item>
+        <item name="android:lineSpacingExtra">4dp</item>
+    </style>
+
+    <style name="TextAppearance.TvIptv.DetailsActionPrimary">
+        <item name="android:textSize">16sp</item>
+        <item name="android:textColor">@color/details_action_primary_text</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+
+    <style name="TextAppearance.TvIptv.DetailsActionSecondary">
+        <item name="android:textSize">16sp</item>
+        <item name="android:textColor">@color/on_surface</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+
+    <style name="TextAppearance.TvIptv.PlayerCategory">
+        <item name="android:textSize">16sp</item>
+        <item name="android:textColor">@color/on_surface_secondary</item>
+    </style>
+
+    <style name="Widget.TvIptv.ProgressBar" parent="Widget.AppCompat.ProgressBar">
+        <item name="android:indeterminateTint">@color/primary</item>
+    </style>
+
+    <style name="TextAppearance.TvIptv.ChromeLogo">
+        <item name="android:textSize">20sp</item>
+        <item name="android:textColor">@color/on_surface</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:letterSpacing">0.12</item>
+        <item name="android:textAllCaps">true</item>
+    </style>
+
+    <style name="TextAppearance.TvIptv.ChromeSearch">
+        <item name="android:textSize">14sp</item>
+        <item name="android:textColor">@color/on_surface_secondary</item>
+    </style>
+
+    <style name="TextAppearance.TvIptv.ChromeClock">
+        <item name="android:textSize">@dimen/chrome_clock_text_size</item>
+        <item name="android:textColor">@color/on_surface</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+
+    <style name="TextAppearance.TvIptv.ChromeDate">
+        <item name="android:textSize">@dimen/chrome_date_text_size</item>
+        <item name="android:textColor">@color/on_surface_secondary</item>
+    </style>
+
+    <style name="TextAppearance.TvIptv.LauncherTitle">
+        <item name="android:textSize">22sp</item>
+        <item name="android:textColor">@color/on_surface</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+
+    <style name="TextAppearance.TvIptv.LauncherMeta">
+        <item name="android:textSize">14sp</item>
+        <item name="android:textColor">@color/on_surface_secondary</item>
+    </style>
+
+    <style name="TextAppearance.TvIptv.LauncherBadge">
+        <item name="android:textSize">11sp</item>
+        <item name="android:textColor">@color/on_surface_secondary</item>
+    </style>
+
+    <style name="TextAppearance.TvIptv.SettingsTitle">
+        <item name="android:textSize">32sp</item>
+        <item name="android:textColor">@color/on_surface</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+
+    <style name="TextAppearance.TvIptv.SettingsItem">
+        <item name="android:textSize">18sp</item>
+        <item name="android:textColor">@color/on_surface</item>
+    </style>
+
+    <style name="TextAppearance.TvIptv.PlayerOverlayTitle">
+        <item name="android:textSize">32sp</item>
+        <item name="android:textColor">@color/on_surface</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+
+    <style name="TextAppearance.TvIptv.PlayerOverlayMeta">
+        <item name="android:textSize">16sp</item>
+        <item name="android:textColor">@color/on_surface_secondary</item>
+    </style>
+
+    <style name="TextAppearance.TvIptv.PlayerTimer">
+        <item name="android:textSize">18sp</item>
+        <item name="android:textColor">@color/on_surface</item>
+    </style>
+</resources>

@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.tviptv.app.data.m3u.M3uParserTest" tests="4" skipped="0" failures="0" errors="0" timestamp="2026-06-22T01:57:53" hostname="Apples-MacBook-Pro.local" time="0.006">
+  <properties/>
+  <testcase name="parse_deduplicatesByStreamUrl" classname="com.tviptv.app.data.m3u.M3uParserTest" time="0.002"/>
+  <testcase name="parse_assignsDefaultCategoryWhenMissing" classname="com.tviptv.app.data.m3u.M3uParserTest" time="0.001"/>
+  <testcase name="parse_extractsChannelNumberFromTvgChno" classname="com.tviptv.app.data.m3u.M3uParserTest" time="0.0"/>
+  <testcase name="parseSamplePlaylist_extractsChannelsAndCategories" classname="com.tviptv.app.data.m3u.M3uParserTest" time="0.003"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

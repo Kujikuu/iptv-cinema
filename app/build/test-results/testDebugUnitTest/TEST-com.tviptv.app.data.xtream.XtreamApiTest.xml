@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.tviptv.app.data.xtream.XtreamApiTest" tests="3" skipped="0" failures="0" errors="0" timestamp="2026-06-22T01:57:53" hostname="Apples-MacBook-Pro.local" time="0.127">
+  <properties/>
+  <testcase name="getLiveStreams_parsesChannelList" classname="com.tviptv.app.data.xtream.XtreamApiTest" time="0.104"/>
+  <testcase name="getLiveCategories_parsesCategoryList" classname="com.tviptv.app.data.xtream.XtreamApiTest" time="0.011"/>
+  <testcase name="authenticate_parsesActiveUser" classname="com.tviptv.app.data.xtream.XtreamApiTest" time="0.012"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

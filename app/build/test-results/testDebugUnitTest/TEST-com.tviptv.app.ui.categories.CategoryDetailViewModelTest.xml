@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.tviptv.app.ui.categories.CategoryDetailViewModelTest" tests="3" skipped="0" failures="0" errors="0" timestamp="2026-06-22T01:57:56" hostname="Apples-MacBook-Pro.local" time="0.143">
+  <properties/>
+  <testcase name="load_cacheMiss_usesParallelFirstPageLoader" classname="com.tviptv.app.ui.categories.CategoryDetailViewModelTest" time="0.075"/>
+  <testcase name="loadNextPage_afterFirstPage_fetchesNextOffsetFromDao" classname="com.tviptv.app.ui.categories.CategoryDetailViewModelTest" time="0.036"/>
+  <testcase name="load_cacheHit_skipsDatabaseAndRestoresState" classname="com.tviptv.app.ui.categories.CategoryDetailViewModelTest" time="0.032"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

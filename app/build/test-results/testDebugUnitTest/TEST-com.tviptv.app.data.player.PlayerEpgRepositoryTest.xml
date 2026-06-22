@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.tviptv.app.data.player.PlayerEpgRepositoryTest" tests="3" skipped="0" failures="0" errors="0" timestamp="2026-06-22T01:57:53" hostname="Apples-MacBook-Pro.local" time="0.151">
+  <properties/>
+  <testcase name="getNowNext_returnsCurrentAndNextPrograms" classname="com.tviptv.app.data.player.PlayerEpgRepositoryTest" time="0.116"/>
+  <testcase name="fetchAndCache_skipsWhenSourceNotFound" classname="com.tviptv.app.data.player.PlayerEpgRepositoryTest" time="0.033"/>
+  <testcase name="isStale_returnsTrueWhenNeverFetched" classname="com.tviptv.app.data.player.PlayerEpgRepositoryTest" time="0.002"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

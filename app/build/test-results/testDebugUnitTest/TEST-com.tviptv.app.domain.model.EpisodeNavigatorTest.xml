@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.tviptv.app.domain.model.EpisodeNavigatorTest" tests="7" skipped="0" failures="0" errors="0" timestamp="2026-06-22T01:57:55" hostname="Apples-MacBook-Pro.local" time="0.002">
+  <properties/>
+  <testcase name="findNextEpisode_returnsNullForSingleEpisode" classname="com.tviptv.app.domain.model.EpisodeNavigatorTest" time="0.001"/>
+  <testcase name="firstEpisode_returnsEarliestSeasonAndEpisode" classname="com.tviptv.app.domain.model.EpisodeNavigatorTest" time="0.001"/>
+  <testcase name="findNextEpisode_returnsNextInSameSeason" classname="com.tviptv.app.domain.model.EpisodeNavigatorTest" time="0.0"/>
+  <testcase name="findNextEpisode_crossesSeasonBoundary" classname="com.tviptv.app.domain.model.EpisodeNavigatorTest" time="0.0"/>
+  <testcase name="findNextEpisode_returnsNullForUnknownEpisode" classname="com.tviptv.app.domain.model.EpisodeNavigatorTest" time="0.0"/>
+  <testcase name="findNextEpisode_sortsAscendingRegardlessOfInputOrder" classname="com.tviptv.app.domain.model.EpisodeNavigatorTest" time="0.0"/>
+  <testcase name="findNextEpisode_returnsNullForLastEpisode" classname="com.tviptv.app.domain.model.EpisodeNavigatorTest" time="0.0"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

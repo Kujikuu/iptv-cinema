@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.tviptv.app.ui.common.ContentImageBindingsTest" tests="4" skipped="0" failures="0" errors="0" timestamp="2026-06-22T01:57:56" hostname="Apples-MacBook-Pro.local" time="0.001">
+  <properties/>
+  <testcase name="placeholderFor_movie_returnsMovieDrawable" classname="com.tviptv.app.ui.common.ContentImageBindingsTest" time="0.0"/>
+  <testcase name="placeholderFor_episode_returnsEpisodeDrawable" classname="com.tviptv.app.ui.common.ContentImageBindingsTest" time="0.0"/>
+  <testcase name="placeholderFor_live_returnsLiveDrawable" classname="com.tviptv.app.ui.common.ContentImageBindingsTest" time="0.001"/>
+  <testcase name="placeholderFor_series_returnsSeriesDrawable" classname="com.tviptv.app.ui.common.ContentImageBindingsTest" time="0.0"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

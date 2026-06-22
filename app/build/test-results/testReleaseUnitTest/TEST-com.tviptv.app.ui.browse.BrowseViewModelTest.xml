@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.tviptv.app.ui.browse.BrowseViewModelTest" tests="12" skipped="0" failures="0" errors="0" timestamp="2026-06-22T01:58:00" hostname="Apples-MacBook-Pro.local" time="0.814">
+  <properties/>
+  <testcase name="loadInitial_buildsCategoryRowsAndFeaturedFromContinueWatching" classname="com.tviptv.app.ui.browse.BrowseViewModelTest" time="0.272"/>
+  <testcase name="refreshCurrentSource_reloadsFeed" classname="com.tviptv.app.ui.browse.BrowseViewModelTest" time="0.058"/>
+  <testcase name="toggleFavorite_insertsAndDeletesFavoriteWithoutFullReload" classname="com.tviptv.app.ui.browse.BrowseViewModelTest" time="0.054"/>
+  <testcase name="markHomeSection_updatesSelectedSectionWithoutReload" classname="com.tviptv.app.ui.browse.BrowseViewModelTest" time="0.049"/>
+  <testcase name="continueWatchingForSection_filtersByContentType" classname="com.tviptv.app.ui.browse.BrowseViewModelTest" time="0.051"/>
+  <testcase name="selectSection_buildsCategorySummaries" classname="com.tviptv.app.ui.browse.BrowseViewModelTest" time="0.05"/>
+  <testcase name="featuredChannel_fallsBackToHomeCategoryHighlight" classname="com.tviptv.app.ui.browse.BrowseViewModelTest" time="0.049"/>
+  <testcase name="featuredChannel_fallsBackToFavoriteWhenNoContinueWatching" classname="com.tviptv.app.ui.browse.BrowseViewModelTest" time="0.047"/>
+  <testcase name="rememberLastWatched_upsertsChannel" classname="com.tviptv.app.ui.browse.BrowseViewModelTest" time="0.047"/>
+  <testcase name="refreshContinueWatching_updatesStateWithoutFullReload" classname="com.tviptv.app.ui.browse.BrowseViewModelTest" time="0.052"/>
+  <testcase name="selectSection_sortsCategoriesByLatestAddedAt" classname="com.tviptv.app.ui.browse.BrowseViewModelTest" time="0.043"/>
+  <testcase name="loadInitial_withNoSources_leavesBrowseEmpty" classname="com.tviptv.app.ui.browse.BrowseViewModelTest" time="0.041"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

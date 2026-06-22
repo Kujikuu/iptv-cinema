@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<TextView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/section_tab_label"
+    android:layout_width="wrap_content"
+    android:layout_height="@dimen/section_tab_height"
+    android:background="@drawable/section_tab_bg"
+    android:focusable="true"
+    android:focusableInTouchMode="true"
+    android:gravity="center"
+    android:minWidth="120dp"
+    android:paddingHorizontal="@dimen/section_tab_padding_h"
+    android:textAppearance="@style/TextAppearance.TvIptv.SectionTab"
+    android:textColor="@color/on_primary"
+    tools:text="Movies" />

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.tviptv.app.data.m3u.M3uRepositoryTest" tests="5" skipped="0" failures="0" errors="0" timestamp="2026-06-22T01:57:58" hostname="Apples-MacBook-Pro.local" time="0.225">
+  <properties/>
+  <testcase name="resolveStreamUrl_failsWhenStreamUrlMissing" classname="com.tviptv.app.data.m3u.M3uRepositoryTest" time="0.156"/>
+  <testcase name="validateAndParse_readsLocalM3uFile" classname="com.tviptv.app.data.m3u.M3uRepositoryTest" time="0.005"/>
+  <testcase name="refreshSource_cachesParsedPlaylistFromFile" classname="com.tviptv.app.data.m3u.M3uRepositoryTest" time="0.058"/>
+  <testcase name="resolveStreamUrl_returnsChannelStreamUrl" classname="com.tviptv.app.data.m3u.M3uRepositoryTest" time="0.001"/>
+  <testcase name="getChannels_filtersByCategoryWhenRequested" classname="com.tviptv.app.data.m3u.M3uRepositoryTest" time="0.005"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

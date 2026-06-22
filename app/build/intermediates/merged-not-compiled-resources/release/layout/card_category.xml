@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="@dimen/card_width_category"
+    android:layout_height="@dimen/card_height_category"
+    android:clipChildren="false"
+    android:clipToPadding="false"
+    android:focusable="true"
+    android:focusableInTouchMode="true">
+
+    <androidx.cardview.widget.CardView
+        android:id="@+id/category_card_container"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:cardBackgroundColor="@color/surface_elevated"
+        app:cardCornerRadius="@dimen/card_corner_radius"
+        app:cardElevation="0dp"
+        app:cardPreventCornerOverlap="false"
+        app:cardUseCompatPadding="false">
+
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <ImageView
+                android:id="@+id/category_preview"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:contentDescription="@null"
+                android:scaleType="centerCrop"
+                tools:src="@drawable/card_placeholder" />
+
+            <View
+                android:id="@+id/category_accent_bar"
+                android:layout_width="@dimen/category_accent_width"
+                android:layout_height="match_parent"
+                android:background="@drawable/category_accent_bar_muted" />
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@drawable/category_scrim_gradient" />
+
+            <TextView
+                android:id="@+id/category_type_badge"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="top|end"
+                android:layout_margin="10dp"
+                android:background="@drawable/badge_chip_bg"
+                android:paddingHorizontal="8dp"
+                android:paddingVertical="3dp"
+                android:textAppearance="@style/TextAppearance.TvIptv.Badge"
+                android:visibility="gone"
+                tools:text="MOVIES"
+                tools:visibility="visible" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="bottom"
+                android:orientation="vertical"
+                android:paddingHorizontal="14dp"
+                android:paddingTop="32dp"
+                android:paddingBottom="12dp">
+
+                <TextView
+                    android:id="@+id/category_name"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:ellipsize="end"
+                    android:includeFontPadding="false"
+                    android:maxLines="2"
+                    android:textAppearance="@style/TextAppearance.TvIptv.CategoryTitle"
+                    tools:text="Animation Movies | انمي" />
+
+                <TextView
+                    android:id="@+id/category_count"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:ellipsize="end"
+                    android:includeFontPadding="false"
+                    android:maxLines="1"
+                    android:textAppearance="@style/TextAppearance.TvIptv.CategorySubtitle"
+                    tools:text="304 titles" />
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/category_hint"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="bottom|start"
+                android:layout_marginStart="14dp"
+                android:layout_marginBottom="10dp"
+                android:text="@string/press_to_browse"
+                android:textAppearance="@style/TextAppearance.TvIptv.HeroHint"
+                android:visibility="invisible"
+                tools:visibility="visible" />
+        </FrameLayout>
+    </androidx.cardview.widget.CardView>
+</FrameLayout>

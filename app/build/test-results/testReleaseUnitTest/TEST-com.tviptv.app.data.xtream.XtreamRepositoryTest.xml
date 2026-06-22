@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.tviptv.app.data.xtream.XtreamRepositoryTest" tests="5" skipped="0" failures="0" errors="0" timestamp="2026-06-22T01:58:00" hostname="Apples-MacBook-Pro.local" time="0.066">
+  <properties/>
+  <testcase name="getCategories_returnsMappedCategories" classname="com.tviptv.app.data.xtream.XtreamRepositoryTest" time="0.023"/>
+  <testcase name="validateCredentials_acceptsActiveUser" classname="com.tviptv.app.data.xtream.XtreamRepositoryTest" time="0.014"/>
+  <testcase name="resolveStreamUrl_buildsXtreamLiveUrl" classname="com.tviptv.app.data.xtream.XtreamRepositoryTest" time="0.005"/>
+  <testcase name="validateCredentials_rejectsUnauthorizedUser" classname="com.tviptv.app.data.xtream.XtreamRepositoryTest" time="0.002"/>
+  <testcase name="refreshSource_cachesCategoriesAndChannels" classname="com.tviptv.app.data.xtream.XtreamRepositoryTest" time="0.021"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

@@ -1,0 +1,595 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@android:color/black">
+
+    <androidx.media3.ui.PlayerView
+        android:id="@+id/player_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:keepScreenOn="true"
+        app:show_buffering="never"
+        app:use_controller="false" />
+
+    <FrameLayout
+        android:id="@+id/player_overlay"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="gone">
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="200dp"
+            android:background="@drawable/player_top_scrim" />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="320dp"
+            android:layout_gravity="bottom"
+            android:background="@drawable/player_youtube_bottom_scrim" />
+
+        <LinearLayout
+            android:id="@+id/player_controls_root"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom"
+            android:clipChildren="false"
+            android:clipToPadding="false"
+            android:orientation="vertical"
+            android:paddingHorizontal="56dp"
+            android:paddingBottom="32dp">
+
+            <TextView
+                android:id="@+id/player_title"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:ellipsize="end"
+                android:maxLines="1"
+                android:textAppearance="@style/TextAppearance.TvIptv.PlayerOverlayTitle"
+                android:textSize="22sp"
+                tools:text="Family Business - FHD" />
+
+            <LinearLayout
+                android:id="@+id/player_meta_row"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <LinearLayout
+                    android:id="@+id/player_live_badge_row"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal"
+                    android:visibility="gone">
+
+                    <View
+                        android:layout_width="6dp"
+                        android:layout_height="6dp"
+                        android:background="@drawable/live_dot" />
+
+                    <TextView
+                        android:id="@+id/player_type_badge"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="6dp"
+                        android:text="@string/live_badge"
+                        android:textAppearance="@style/TextAppearance.TvIptv.Badge"
+                        android:textColor="@color/primary" />
+                </LinearLayout>
+
+                <TextView
+                    android:id="@+id/player_subtitle"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:ellipsize="end"
+                    android:maxLines="1"
+                    android:textAppearance="@style/TextAppearance.TvIptv.PlayerOverlayMeta"
+                    android:textSize="14sp"
+                    tools:text="ARABIC | 2020" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/player_epg_row"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="6dp"
+                android:orientation="vertical"
+                android:visibility="gone"
+                tools:visibility="visible">
+
+                <TextView
+                    android:id="@+id/player_epg_now"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:ellipsize="end"
+                    android:maxLines="1"
+                    android:textAppearance="@style/TextAppearance.TvIptv.PlayerOverlayMeta"
+                    android:textSize="14sp"
+                    tools:text="Now: Planet Earth" />
+
+                <ProgressBar
+                    android:id="@+id/player_epg_progress"
+                    style="@android:style/Widget.ProgressBar.Horizontal"
+                    android:layout_width="match_parent"
+                    android:layout_height="3dp"
+                    android:layout_marginTop="6dp"
+                    android:max="100"
+                    android:progressTint="@color/primary"
+                    tools:progress="45" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/player_seek_container"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:visibility="gone"
+                tools:visibility="visible">
+
+                <TextView
+                    android:id="@+id/player_position"
+                    android:layout_width="52dp"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="@style/TextAppearance.TvIptv.PlayerTimer"
+                    android:textSize="14sp"
+                    tools:text="24:06" />
+
+                <androidx.media3.ui.DefaultTimeBar
+                    android:id="@+id/player_time_bar"
+                    android:layout_width="0dp"
+                    android:layout_height="32dp"
+                    android:layout_marginHorizontal="12dp"
+                    android:layout_weight="1"
+                    android:contentDescription="@string/player_playback_speed"
+                    android:focusable="true"
+                    android:focusableInTouchMode="true"
+                    android:nextFocusDown="@id/player_play_pause"
+                    app:bar_height="4dp"
+                    app:played_color="@color/primary"
+                    app:scrubber_color="@color/primary"
+                    app:scrubber_dragged_size="14dp"
+                    app:scrubber_enabled_size="12dp"
+                    app:unplayed_color="#55FFFFFF" />
+
+                <TextView
+                    android:id="@+id/player_duration"
+                    android:layout_width="52dp"
+                    android:layout_height="wrap_content"
+                    android:gravity="end"
+                    android:textAppearance="@style/TextAppearance.TvIptv.PlayerTimer"
+                    android:textSize="14sp"
+                    tools:text="1:44:12" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:clipChildren="false"
+                android:clipToPadding="false"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <ImageButton
+                    android:id="@+id/player_prev"
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    android:background="@drawable/player_transport_button"
+                    android:contentDescription="@string/player_rewind"
+                    android:focusable="true"
+                    android:focusableInTouchMode="true"
+                    android:nextFocusRight="@id/player_play_pause"
+                    android:nextFocusUp="@id/player_time_bar"
+                    android:padding="12dp"
+                    android:scaleType="centerInside"
+                    android:src="@drawable/ic_player_replay_10"
+                    app:tint="@color/on_surface" />
+
+                <ImageButton
+                    android:id="@+id/player_play_pause"
+                    android:layout_width="64dp"
+                    android:layout_height="64dp"
+                    android:layout_marginHorizontal="16dp"
+                    android:background="@drawable/player_transport_button"
+                    android:contentDescription="@string/player_play_pause"
+                    android:focusable="true"
+                    android:focusableInTouchMode="true"
+                    android:nextFocusDown="@id/player_subtitles"
+                    android:nextFocusLeft="@id/player_prev"
+                    android:nextFocusRight="@id/player_next"
+                    android:nextFocusUp="@id/player_time_bar"
+                    android:padding="16dp"
+                    android:scaleType="centerInside"
+                    android:src="@drawable/ic_player_pause"
+                    app:tint="@color/on_surface" />
+
+                <ImageButton
+                    android:id="@+id/player_next"
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    android:background="@drawable/player_transport_button"
+                    android:contentDescription="@string/player_forward"
+                    android:focusable="true"
+                    android:focusableInTouchMode="true"
+                    android:nextFocusLeft="@id/player_play_pause"
+                    android:nextFocusUp="@id/player_time_bar"
+                    android:padding="12dp"
+                    android:scaleType="centerInside"
+                    android:src="@drawable/ic_player_forward_10"
+                    app:tint="@color/on_surface" />
+
+                <Space
+                    android:layout_width="0dp"
+                    android:layout_height="0dp"
+                    android:layout_weight="1" />
+
+                <ImageButton
+                    android:id="@+id/player_audio"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:background="@drawable/player_transport_button"
+                    android:contentDescription="@string/player_audio"
+                    android:focusable="true"
+                    android:focusableInTouchMode="true"
+                    android:nextFocusUp="@id/player_play_pause"
+                    android:padding="8dp"
+                    android:scaleType="centerInside"
+                    android:src="@drawable/ic_player_audio"
+                    app:tint="@color/on_surface" />
+
+                <ImageButton
+                    android:id="@+id/player_subtitles"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:layout_marginStart="8dp"
+                    android:background="@drawable/player_transport_button"
+                    android:contentDescription="@string/player_subtitles"
+                    android:focusable="true"
+                    android:focusableInTouchMode="true"
+                    android:nextFocusUp="@id/player_play_pause"
+                    android:padding="8dp"
+                    android:scaleType="centerInside"
+                    android:src="@drawable/ic_player_subtitles"
+                    app:tint="@color/on_surface" />
+
+                <ImageButton
+                    android:id="@+id/player_settings"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:layout_marginStart="8dp"
+                    android:background="@drawable/player_transport_button"
+                    android:contentDescription="@string/player_settings"
+                    android:focusable="true"
+                    android:focusableInTouchMode="true"
+                    android:padding="8dp"
+                    android:scaleType="centerInside"
+                    android:src="@drawable/ic_settings"
+                    app:tint="@color/on_surface" />
+
+                <ImageButton
+                    android:id="@+id/player_favorite"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:layout_marginStart="8dp"
+                    android:background="@drawable/player_transport_button"
+                    android:contentDescription="@string/add_favorite"
+                    android:focusable="true"
+                    android:focusableInTouchMode="true"
+                    android:padding="8dp"
+                    android:scaleType="centerInside"
+                    android:src="@drawable/ic_player_favorite"
+                    app:tint="@color/on_surface" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/player_seek_preview"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:background="@drawable/player_zap_toast_bg"
+            android:paddingHorizontal="20dp"
+            android:paddingVertical="10dp"
+            android:textAppearance="@style/TextAppearance.TvIptv.PlayerChannelName"
+            android:textSize="28sp"
+            android:visibility="gone"
+            tools:text="+10s" />
+
+        <!-- Hidden views kept for binding compatibility -->
+        <ImageView
+            android:id="@+id/player_top_logo"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:visibility="gone"
+            android:contentDescription="@null" />
+
+        <TextView
+            android:id="@+id/player_top_clock"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:visibility="gone" />
+
+        <TextView
+            android:id="@+id/player_timer"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:visibility="gone" />
+
+        <TextView
+            android:id="@+id/player_epg_next"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:visibility="gone" />
+    </FrameLayout>
+
+    <FrameLayout
+        android:id="@+id/player_pause_overlay"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="gone">
+
+        <ImageView
+            android:id="@+id/player_pause_icon"
+            android:layout_width="96dp"
+            android:layout_height="96dp"
+            android:layout_gravity="center"
+            android:background="@drawable/player_transport_button"
+            android:contentDescription="@string/player_paused"
+            android:padding="24dp"
+            android:scaleType="centerInside"
+            android:src="@drawable/ic_player_pause"
+            app:tint="@color/on_surface" />
+    </FrameLayout>
+
+    <TextView
+        android:id="@+id/player_toast"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|center_horizontal"
+        android:layout_marginBottom="120dp"
+        android:background="@drawable/player_zap_toast_bg"
+        android:paddingHorizontal="20dp"
+        android:paddingVertical="10dp"
+        android:textAppearance="@style/TextAppearance.TvIptv.PlayerOverlayMeta"
+        android:textSize="16sp"
+        android:visibility="gone"
+        tools:text="No subtitles available" />
+
+    <FrameLayout
+        android:id="@+id/player_channel_list_panel"
+        android:layout_width="420dp"
+        android:layout_height="match_parent"
+        android:background="@drawable/player_side_panel_scrim"
+        android:visibility="gone">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:padding="24dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                android:text="@string/player_channel_list"
+                android:textAppearance="@style/TextAppearance.TvIptv.PlayerOverlayTitle"
+                android:textSize="24sp" />
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/player_channel_list"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:clipToPadding="false" />
+        </LinearLayout>
+    </FrameLayout>
+
+    <LinearLayout
+        android:id="@+id/player_list_panel"
+        android:layout_width="360dp"
+        android:layout_height="match_parent"
+        android:layout_gravity="end"
+        android:background="@drawable/player_side_panel_scrim"
+        android:orientation="vertical"
+        android:padding="24dp"
+        android:visibility="gone">
+
+        <TextView
+            android:id="@+id/player_list_panel_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
+            android:textAppearance="@style/TextAppearance.TvIptv.PlayerOverlayTitle"
+            android:textSize="22sp"
+            tools:text="Subtitles" />
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/player_list_panel_recycler"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:clipToPadding="false" />
+    </LinearLayout>
+
+    <ScrollView
+        android:id="@+id/player_info_panel"
+        android:layout_width="400dp"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|start"
+        android:layout_margin="@dimen/player_overlay_padding"
+        android:background="@drawable/player_zap_toast_bg"
+        android:padding="20dp"
+        android:visibility="gone">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/player_info_title"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textAppearance="@style/TextAppearance.TvIptv.PlayerOverlayTitle"
+                android:textSize="22sp"
+                tools:text="Planet Earth" />
+
+            <TextView
+                android:id="@+id/player_info_meta"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:textAppearance="@style/TextAppearance.TvIptv.PlayerOverlayMeta"
+                tools:text="12:00 – 13:00" />
+
+            <TextView
+                android:id="@+id/player_info_description"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:textAppearance="@style/TextAppearance.TvIptv.DetailsBody"
+                tools:text="Program description goes here." />
+        </LinearLayout>
+    </ScrollView>
+
+    <TextView
+        android:id="@+id/player_numeric_entry"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="top|end"
+        android:layout_margin="48dp"
+        android:background="@drawable/player_zap_toast_bg"
+        android:paddingHorizontal="24dp"
+        android:paddingVertical="12dp"
+        android:textAppearance="@style/TextAppearance.TvIptv.PlayerOverlayTitle"
+        android:textSize="32sp"
+        android:visibility="gone"
+        tools:text="12"
+        tools:visibility="visible" />
+
+    <include
+        android:id="@+id/player_zap_toast"
+        layout="@layout/player_zap_toast"
+        android:layout_width="320dp"
+        android:layout_height="wrap_content"
+        android:layout_gravity="top|center_horizontal"
+        android:layout_marginTop="48dp"
+        android:visibility="gone" />
+
+    <LinearLayout
+        android:id="@+id/player_next_episode_card"
+        android:layout_width="360dp"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|end"
+        android:layout_margin="@dimen/player_overlay_padding"
+        android:background="@drawable/player_zap_toast_bg"
+        android:orientation="vertical"
+        android:padding="20dp"
+        android:visibility="gone">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/player_next_episode_label"
+            android:textAppearance="@style/TextAppearance.TvIptv.PlayerOverlayMeta" />
+
+        <TextView
+            android:id="@+id/player_next_episode_title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:ellipsize="end"
+            android:maxLines="2"
+            android:textAppearance="@style/TextAppearance.TvIptv.PlayerOverlayTitle"
+            android:textSize="18sp"
+            tools:text="S2 E4 · The Next Chapter" />
+
+        <TextView
+            android:id="@+id/player_next_episode_countdown"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:textAppearance="@style/TextAppearance.TvIptv.PlayerOverlayMeta"
+            tools:text="Playing next in 5…" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/player_next_episode_play"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="8dp"
+                android:layout_weight="1"
+                android:background="@drawable/settings_item_bg"
+                android:focusable="true"
+                android:focusableInTouchMode="true"
+                android:gravity="center"
+                android:paddingHorizontal="16dp"
+                android:paddingVertical="12dp"
+                android:text="@string/player_next_episode_play_now"
+                android:textAppearance="@style/TextAppearance.TvIptv.SettingsItem" />
+
+            <TextView
+                android:id="@+id/player_next_episode_cancel"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:background="@drawable/settings_item_bg"
+                android:focusable="true"
+                android:focusableInTouchMode="true"
+                android:gravity="center"
+                android:paddingHorizontal="16dp"
+                android:paddingVertical="12dp"
+                android:text="@string/player_next_episode_cancel"
+                android:textAppearance="@style/TextAppearance.TvIptv.SettingsItem" />
+        </LinearLayout>
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/error_container"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:padding="32dp"
+        android:visibility="gone">
+
+        <TextView
+            android:id="@+id/error_message"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:textAppearance="@style/TextAppearance.TvIptv.PlayerCategory"
+            android:textColor="@color/error" />
+
+        <Button
+            android:id="@+id/retry_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:text="@string/retry"
+            android:textColor="@color/on_surface" />
+    </LinearLayout>
+
+    <ProgressBar
+        android:id="@+id/buffering"
+        style="@style/Widget.TvIptv.ProgressBar"
+        android:layout_width="64dp"
+        android:layout_height="64dp"
+        android:layout_gravity="center"
+        android:visibility="gone" />
+</FrameLayout>
