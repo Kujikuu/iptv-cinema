@@ -7,7 +7,15 @@ data class SectionLauncherItem(
     val title: String,
     val countLabel: String,
     val lastUpdateLabel: String?,
+    val refreshStatus: SectionRefreshStatus = SectionRefreshStatus.IDLE,
     val iconRes: Int,
     val previewImageUrl: String? = null,
     val previewFallbackRes: Int,
 )
+
+enum class SectionRefreshStatus {
+    IDLE,
+    REFRESHING,
+    SUCCESS,
+    ERROR,
+}

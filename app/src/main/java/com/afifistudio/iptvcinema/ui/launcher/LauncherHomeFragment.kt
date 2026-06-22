@@ -1,11 +1,18 @@
 package com.afifistudio.iptvcinema.ui.launcher
 
+import android.app.Dialog
+import android.graphics.Color
+import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.text.format.DateUtils
 import android.view.KeyEvent
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.Window
+import android.view.WindowManager
+import android.widget.TextView
+import android.widget.Toast
 import androidx.core.view.isVisible
 import androidx.core.widget.NestedScrollView
 import androidx.fragment.app.Fragment
@@ -23,6 +30,7 @@ import com.afifistudio.iptvcinema.R
 import com.afifistudio.iptvcinema.databinding.FragmentLauncherHomeBinding
 import com.afifistudio.iptvcinema.domain.model.ContentType
 import com.afifistudio.iptvcinema.domain.model.ContinueWatchingItem
+import com.afifistudio.iptvcinema.domain.model.SourceType
 import com.afifistudio.iptvcinema.ui.ContentFocusHandler
 import com.afifistudio.iptvcinema.ui.HomeChromeHost
 import com.afifistudio.iptvcinema.ui.HomeChromeMode
@@ -47,6 +55,7 @@ import com.afifistudio.iptvcinema.ui.player.PlayerActivity
 import com.afifistudio.iptvcinema.domain.model.Channel
 import androidx.leanback.widget.HorizontalGridView
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -65,6 +74,7 @@ class LauncherHomeFragment : Fragment() {
     private var continueWatchingItems: List<ContinueWatchingItem> = emptyList()
     private var lastFocusedGridId: Int = R.id.launcher_grid
     private var hasRequestedInitialFocus = false
+    private val sectionRefreshStatuses = mutableMapOf<BrowseSection, SectionRefreshStatus>()
 
     private val contentFocusHandler = object : ContentFocusHandler {
         override fun requestInitialFocus(): Boolean {
@@ -135,9 +145,10 @@ class LauncherHomeFragment : Fragment() {
 
     private fun setupGrid() {
         gridAdapter = ArrayObjectAdapter(
-            SectionLauncherCardPresenter { sectionItem ->
-                openSection(sectionItem.section)
-            },
+            SectionLauncherCardPresenter(
+                onItemClick = { sectionItem -> openSection(sectionItem.section) },
+                onItemLongPress = { sectionItem -> showSectionActionMenu(sectionItem) },
+            ),
         )
         val bridgeAdapter = ItemBridgeAdapter(gridAdapter)
         FocusHighlightHelper.setupBrowseItemFocusHighlight(
@@ -422,7 +433,7 @@ class LauncherHomeFragment : Fragment() {
                     renderRecommendations(state)
                     updateBackdrop(state)
 
-                    if (!state.isLoading && !hasRequestedInitialFocus) {
+                    if (!state.isBootstrapLoading && !hasRequestedInitialFocus) {
                         hasRequestedInitialFocus = true
                         binding.launcherGrid.post {
                             if (_binding != null) {
@@ -540,6 +551,7 @@ class LauncherHomeFragment : Fragment() {
             title = title,
             countLabel = getString(R.string.loading),
             lastUpdateLabel = null,
+            refreshStatus = sectionRefreshStatuses[section] ?: SectionRefreshStatus.IDLE,
             iconRes = SectionIcons.forSection(section),
             previewImageUrl = null,
             previewFallbackRes = sectionPreviewFallback(section),
@@ -644,6 +656,7 @@ class LauncherHomeFragment : Fragment() {
             title = title,
             countLabel = countLabel,
             lastUpdateLabel = lastUpdate,
+            refreshStatus = sectionRefreshStatuses[section] ?: SectionRefreshStatus.IDLE,
             iconRes = SectionIcons.forSection(section),
             previewImageUrl = previewForContentType(state, contentType),
             previewFallbackRes = sectionPreviewFallback(section),
@@ -689,6 +702,114 @@ class LauncherHomeFragment : Fragment() {
         replaceContent(CategoryGridFragment.newInstance(fromLauncher = true))
     }
 
+    private fun showSectionActionMenu(item: SectionLauncherItem) {
+        val dialog = Dialog(requireContext())
+        val view = layoutInflater.inflate(R.layout.dialog_section_action, null)
+        val selectedSource = browseViewModel.uiState.value.sources.firstOrNull {
+            it.id == browseViewModel.uiState.value.selectedSourceId
+        }
+        val usesPlaylistFallback = selectedSource?.type != SourceType.XTREAM
+
+        view.findViewById<TextView>(R.id.section_action_title).text = item.title
+        view.findViewById<TextView>(R.id.section_action_subtitle).text = if (usesPlaylistFallback) {
+            getString(R.string.section_refresh_playlist_fallback)
+        } else {
+            getString(R.string.section_refresh_section_only)
+        }
+        val refreshAction = view.findViewById<TextView>(R.id.section_action_refresh)
+        refreshAction.text = if (usesPlaylistFallback) {
+            getString(R.string.section_refresh_playlist)
+        } else {
+            sectionRefreshActionLabel(item.section)
+        }
+        view.findViewById<TextView>(R.id.section_action_browse).text =
+            getString(R.string.section_browse_action, item.title)
+
+        refreshAction.setOnClickListener {
+            dialog.dismiss()
+            refreshSectionFromCard(item.section)
+        }
+        view.findViewById<TextView>(R.id.section_action_browse).setOnClickListener {
+            dialog.dismiss()
+            openSection(item.section)
+        }
+
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
+        dialog.setContentView(view)
+        dialog.setOnDismissListener { requestSectionCardFocus(item.section) }
+        dialog.show()
+        dialog.window?.apply {
+            setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+            setDimAmount(0.56f)
+            addFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND)
+            val width = resources.getDimensionPixelSize(R.dimen.section_action_dialog_width)
+            setLayout(width, WindowManager.LayoutParams.WRAP_CONTENT)
+        }
+        refreshAction.requestFocus()
+    }
+
+    private fun refreshSectionFromCard(section: BrowseSection) {
+        setSectionRefreshStatus(section, SectionRefreshStatus.REFRESHING)
+        browseViewModel.refreshSection(section) { result ->
+            if (_binding == null || !isAdded) return@refreshSection
+            val status = if (result.isSuccess) SectionRefreshStatus.SUCCESS else SectionRefreshStatus.ERROR
+            setSectionRefreshStatus(section, status)
+            val message = if (result.isSuccess) {
+                getString(R.string.section_refresh_updated, sectionTitle(section))
+            } else {
+                getString(R.string.section_refresh_failed)
+            }
+            Toast.makeText(requireContext(), message, Toast.LENGTH_SHORT).show()
+            viewLifecycleOwner.lifecycleScope.launch {
+                delay(SECTION_REFRESH_STATUS_RESET_MS)
+                if (sectionRefreshStatuses[section] == status) {
+                    setSectionRefreshStatus(section, SectionRefreshStatus.IDLE)
+                }
+            }
+        }
+    }
+
+    private fun setSectionRefreshStatus(section: BrowseSection, status: SectionRefreshStatus) {
+        if (status == SectionRefreshStatus.IDLE) {
+            sectionRefreshStatuses.remove(section)
+        } else {
+            sectionRefreshStatuses[section] = status
+        }
+        renderSections(browseViewModel.uiState.value)
+        requestSectionCardFocus(section)
+    }
+
+    private fun requestSectionCardFocus(section: BrowseSection) {
+        val position = when (section) {
+            BrowseSection.LIVE -> 0
+            BrowseSection.MOVIES -> 1
+            BrowseSection.SERIES -> 2
+            BrowseSection.HOME -> 0
+        }
+        val activeBinding = _binding ?: return
+        activeBinding.launcherGrid.post {
+            val postedBinding = _binding ?: return@post
+            if (gridAdapter.size() <= position) return@post
+            postedBinding.launcherGrid.selectedPosition = position
+            postedBinding.launcherGrid.requestFocus()
+            scrollToGrid(postedBinding.launcherGrid)
+        }
+    }
+
+    private fun sectionRefreshActionLabel(section: BrowseSection): String = when (section) {
+        BrowseSection.LIVE -> getString(R.string.section_refresh_live)
+        BrowseSection.MOVIES -> getString(R.string.section_refresh_movies)
+        BrowseSection.SERIES -> getString(R.string.section_refresh_series)
+        BrowseSection.HOME -> getString(R.string.action_refresh)
+    }
+
+    private fun sectionTitle(section: BrowseSection): String = when (section) {
+        BrowseSection.LIVE -> getString(R.string.section_live)
+        BrowseSection.MOVIES -> getString(R.string.section_movies)
+        BrowseSection.SERIES -> getString(R.string.section_series)
+        BrowseSection.HOME -> getString(R.string.section_home)
+    }
+
     private fun updateAdapterInPlace(adapter: ArrayObjectAdapter, newItems: List<Any>) {
         if (adapter.size() == newItems.size) {
             for (i in 0 until newItems.size) {
@@ -712,5 +833,6 @@ class LauncherHomeFragment : Fragment() {
     companion object {
         private const val SECTION_COUNT = 3
         private const val CONTINUE_WATCHING_ROW_LIMIT = 15
+        private const val SECTION_REFRESH_STATUS_RESET_MS = 2_400L
     }
 }

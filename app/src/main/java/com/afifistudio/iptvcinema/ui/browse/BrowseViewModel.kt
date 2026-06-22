@@ -42,6 +42,9 @@ data class CategoryRow(
 
 data class BrowseUiState(
     val isLoading: Boolean = true,
+    val isBootstrapLoading: Boolean = true,
+    val isHomeRowsLoading: Boolean = false,
+    val isSectionCacheWarming: Boolean = false,
     val error: String? = null,
     val sources: List<IptvSourceConfig> = emptyList(),
     val selectedSourceId: Long? = null,
@@ -79,6 +82,7 @@ class BrowseViewModel @Inject constructor(
 
     private val _uiState = MutableStateFlow(BrowseUiState())
     val uiState: StateFlow<BrowseUiState> = _uiState.asStateFlow()
+    private var sectionWarmJob: kotlinx.coroutines.Job? = null
 
     init {
         loadInitial()
@@ -86,13 +90,26 @@ class BrowseViewModel @Inject constructor(
 
     fun loadInitial() {
         viewModelScope.launch {
-            _uiState.update { it.copy(isLoading = true, error = null) }
+            _uiState.update {
+                it.copy(
+                    isLoading = true,
+                    isBootstrapLoading = true,
+                    isHomeRowsLoading = false,
+                    error = null,
+                )
+            }
             runCatching {
                 withContext(Dispatchers.IO) {
                     val sources = sourceRepository.getSources()
                     if (sources.isEmpty()) {
                         _uiState.update {
-                            it.copy(isLoading = false, sources = emptyList(), error = null)
+                            it.copy(
+                                isLoading = false,
+                                isBootstrapLoading = false,
+                                isHomeRowsLoading = false,
+                                sources = emptyList(),
+                                error = null,
+                            )
                         }
                         return@withContext
                     }
@@ -102,7 +119,12 @@ class BrowseViewModel @Inject constructor(
                 }
             }.onFailure { error ->
                 _uiState.update {
-                    it.copy(isLoading = false, error = error.message ?: "Failed to load")
+                    it.copy(
+                        isLoading = false,
+                        isBootstrapLoading = false,
+                        isHomeRowsLoading = false,
+                        error = error.message ?: "Failed to load",
+                    )
                 }
             }
         }
@@ -129,7 +151,14 @@ class BrowseViewModel @Inject constructor(
 
     fun deleteSource(sourceId: Long) {
         viewModelScope.launch {
-            _uiState.update { it.copy(isLoading = true, error = null) }
+            _uiState.update {
+                it.copy(
+                    isLoading = true,
+                    isBootstrapLoading = true,
+                    isHomeRowsLoading = false,
+                    error = null,
+                )
+            }
             runCatching {
                 withContext(Dispatchers.IO) {
                     sourceRepository.deleteSource(sourceId)
@@ -141,6 +170,8 @@ class BrowseViewModel @Inject constructor(
                     _uiState.update {
                         it.copy(
                             isLoading = false,
+                            isBootstrapLoading = false,
+                            isHomeRowsLoading = false,
                             sources = emptyList(),
                             selectedSourceId = null,
                             activeSourceName = "",
@@ -153,7 +184,12 @@ class BrowseViewModel @Inject constructor(
                 }
             }.onFailure { error ->
                 _uiState.update {
-                    it.copy(isLoading = false, error = error.message ?: "Failed to delete source")
+                    it.copy(
+                        isLoading = false,
+                        isBootstrapLoading = false,
+                        isHomeRowsLoading = false,
+                        error = error.message ?: "Failed to delete source",
+                    )
                 }
             }
         }
@@ -183,6 +219,7 @@ class BrowseViewModel @Inject constructor(
                             it.copy(
                                 selectedSection = section,
                                 isLoading = false,
+                                isBootstrapLoading = false,
                                 categorySummaries = cached,
                                 error = null,
                             )
@@ -194,6 +231,7 @@ class BrowseViewModel @Inject constructor(
                     it.copy(
                         selectedSection = section,
                         isLoading = true,
+                        isBootstrapLoading = false,
                         categorySummaries = emptyList(),
                         error = null,
                     )
@@ -203,7 +241,11 @@ class BrowseViewModel @Inject constructor(
                 }
             }.onFailure { error ->
                 _uiState.update {
-                    it.copy(isLoading = false, error = error.message ?: "Failed to load section")
+                    it.copy(
+                        isLoading = false,
+                        isBootstrapLoading = false,
+                        error = error.message ?: "Failed to load section",
+                    )
                 }
             }
         }
@@ -217,7 +259,14 @@ class BrowseViewModel @Inject constructor(
     fun refreshCurrentSource() {
         val sourceId = _uiState.value.selectedSourceId ?: return
         viewModelScope.launch {
-            _uiState.update { it.copy(isLoading = true, error = null) }
+            _uiState.update {
+                it.copy(
+                    isLoading = true,
+                    isBootstrapLoading = true,
+                    isHomeRowsLoading = false,
+                    error = null,
+                )
+            }
             runCatching {
                 withContext(Dispatchers.IO) {
                     repositoryFactory.forSource(sourceId).refreshSource(sourceId).getOrThrow()
@@ -227,9 +276,50 @@ class BrowseViewModel @Inject constructor(
                 }
             }.onFailure { error ->
                 _uiState.update {
-                    it.copy(isLoading = false, error = error.message ?: "Refresh failed")
+                    it.copy(
+                        isLoading = false,
+                        isBootstrapLoading = false,
+                        isHomeRowsLoading = false,
+                        error = error.message ?: "Refresh failed",
+                    )
                 }
             }
+        }
+    }
+
+    fun refreshSection(section: BrowseSection, onResult: (Result<Unit>) -> Unit = {}) {
+        val sourceId = _uiState.value.selectedSourceId ?: return
+        val contentType = section.contentType ?: return
+        viewModelScope.launch {
+            runCatching {
+                withContext(Dispatchers.IO) {
+                    val sourceType = sourceRepository.getSource(sourceId)?.type
+                    repositoryFactory.forSource(sourceId)
+                        .refreshSection(sourceId, contentType)
+                        .getOrThrow()
+                    if (sourceType == com.afifistudio.iptvcinema.domain.model.SourceType.XTREAM) {
+                        invalidateSectionCaches(sourceId, section)
+                    } else {
+                        invalidateSourceCaches(sourceId)
+                    }
+                    val sources = sourceRepository.getSources()
+                    _uiState.update { it.copy(sources = sources) }
+                    reloadFeedData(sourceId, BrowseSection.HOME)
+                }
+            }.fold(
+                onSuccess = { onResult(Result.success(Unit)) },
+                onFailure = { error ->
+                    _uiState.update {
+                        it.copy(
+                            isLoading = false,
+                            isBootstrapLoading = false,
+                            isHomeRowsLoading = false,
+                            error = error.message ?: "Refresh failed",
+                        )
+                    }
+                    onResult(Result.failure(error))
+                },
+            )
         }
     }
 
@@ -407,6 +497,8 @@ class BrowseViewModel @Inject constructor(
         _uiState.update {
             it.copy(
                 isLoading = true,
+                isBootstrapLoading = true,
+                isHomeRowsLoading = false,
                 sources = sources,
                 selectedSourceId = sourceId,
                 selectedSection = section,
@@ -427,12 +519,19 @@ class BrowseViewModel @Inject constructor(
             val refreshedSources = sourceRepository.getSources()
             _uiState.update { it.copy(sources = refreshedSources) }
             reloadFeedData(sourceId, section)
-            viewModelScope.launch(Dispatchers.IO) {
+            sectionWarmJob?.cancel()
+            sectionWarmJob = viewModelScope.launch(Dispatchers.IO) {
                 warmSectionCaches(sourceId)
             }
         }.onFailure { error ->
             _uiState.update {
-                it.copy(isLoading = false, error = error.message ?: "Failed to load source")
+                it.copy(
+                    isLoading = false,
+                    isBootstrapLoading = false,
+                    isHomeRowsLoading = false,
+                    isSectionCacheWarming = false,
+                    error = error.message ?: "Failed to load source",
+                )
             }
         }
     }
@@ -457,6 +556,7 @@ class BrowseViewModel @Inject constructor(
             _uiState.update {
                 it.copy(
                     isLoading = false,
+                    isBootstrapLoading = false,
                     error = null,
                     selectedSection = section,
                     categorySummaries = categorySummaries,
@@ -468,11 +568,14 @@ class BrowseViewModel @Inject constructor(
         }
 
         val sourceUpdatedAt = sourceUpdatedAtFor(sourceId)
+        publishHomeShell(sourceId, section, sourceUpdatedAt)
         homeFeedCache.get(sourceId, sourceUpdatedAt)?.let { cached ->
             val activeSource = _uiState.value.sources.firstOrNull { it.id == sourceId }
             _uiState.update {
                 it.copy(
                     isLoading = false,
+                    isBootstrapLoading = false,
+                    isHomeRowsLoading = false,
                     error = null,
                     selectedSection = section,
                     favorites = cached.favorites,
@@ -488,6 +591,16 @@ class BrowseViewModel @Inject constructor(
                 )
             }
             return
+        }
+
+        _uiState.update {
+            it.copy(
+                isLoading = false,
+                isBootstrapLoading = false,
+                isHomeRowsLoading = true,
+                error = null,
+                selectedSection = section,
+            )
         }
 
         val categoryNameMap = categoryNameMapFor(sourceId)
@@ -547,6 +660,8 @@ class BrowseViewModel @Inject constructor(
         _uiState.update {
             it.copy(
                 isLoading = false,
+                isBootstrapLoading = false,
+                isHomeRowsLoading = false,
                 error = null,
                 selectedSection = section,
                 favorites = favorites,
@@ -567,20 +682,25 @@ class BrowseViewModel @Inject constructor(
     }
 
     private suspend fun warmSectionCaches(sourceId: Long) {
+        _uiState.update { it.copy(isSectionCacheWarming = true) }
         val sourceUpdatedAt = sourceUpdatedAtFor(sourceId)
         val repository = repositoryFactory.forSource(sourceId)
-        listOf(BrowseSection.LIVE, BrowseSection.MOVIES, BrowseSection.SERIES).forEach { section ->
-            if (sectionFeedCache.get(sourceId, section, sourceUpdatedAt) != null) return@forEach
-            val contentType = section.contentType
-            val categories = repository.getCategories(sourceId, contentType).getOrNull().orEmpty()
-            if (categories.isEmpty()) return@forEach
-            val summaries = loadCategorySummaries(
-                sourceId = sourceId,
-                categories = categories,
-                contentType = contentType,
-                previewLimit = CATEGORY_GRID_PREVIEW_LIMIT,
-            )
-            sectionFeedCache.put(sourceId, section, sourceUpdatedAt, summaries)
+        try {
+            listOf(BrowseSection.LIVE, BrowseSection.MOVIES, BrowseSection.SERIES).forEach { section ->
+                if (sectionFeedCache.get(sourceId, section, sourceUpdatedAt) != null) return@forEach
+                val contentType = section.contentType
+                val categories = repository.getCategories(sourceId, contentType).getOrNull().orEmpty()
+                if (categories.isEmpty()) return@forEach
+                val summaries = loadCategorySummaries(
+                    sourceId = sourceId,
+                    categories = categories,
+                    contentType = contentType,
+                    previewLimit = CATEGORY_GRID_PREVIEW_LIMIT,
+                )
+                sectionFeedCache.put(sourceId, section, sourceUpdatedAt, summaries)
+            }
+        } finally {
+            _uiState.update { it.copy(isSectionCacheWarming = false) }
         }
     }
 
@@ -596,6 +716,20 @@ class BrowseViewModel @Inject constructor(
                 seriesCount = seriesCount,
                 sourceUpdatedAt = activeSource?.updatedAt ?: 0L,
                 activeSourceName = activeSource?.name.orEmpty(),
+            )
+        }
+    }
+
+    private fun publishHomeShell(sourceId: Long, section: BrowseSection, sourceUpdatedAt: Long) {
+        val activeSource = _uiState.value.sources.firstOrNull { it.id == sourceId }
+        _uiState.update {
+            it.copy(
+                isLoading = false,
+                isBootstrapLoading = false,
+                selectedSection = section,
+                sourceUpdatedAt = activeSource?.updatedAt ?: sourceUpdatedAt,
+                activeSourceName = activeSource?.name.orEmpty(),
+                error = null,
             )
         }
     }
@@ -620,22 +754,13 @@ class BrowseViewModel @Inject constructor(
         if (contentType == null) return emptyList()
         val counts = channelDao.getCategoryCounts(sourceId, contentType)
             .associateBy { it.categoryId }
-        val previewLogos = if (previewLimit > 0) {
-            channelDao.getChannelsWithLogosForPreviews(sourceId, contentType)
-                .groupBy { it.categoryId }
-                .mapValues { (_, channels) ->
-                    channels.take(previewLimit).mapNotNull { it.logoUrl }.distinct()
-                }
-        } else {
-            emptyMap()
-        }
-        return categories.mapNotNull { category ->
+        val sorted = categories.mapNotNull { category ->
             val stats = counts[category.id] ?: return@mapNotNull null
             if (stats.count == 0) return@mapNotNull null
             CategorySummary(
                 category = category,
                 channelCount = stats.count,
-                previewImageUrls = previewLogos[category.id].orEmpty(),
+                previewImageUrls = emptyList(),
                 latestAddedAt = stats.latestAddedAt ?: 0L,
             )
         }.sortedWith(
@@ -643,6 +768,16 @@ class BrowseViewModel @Inject constructor(
                 .thenByDescending { it.channelCount }
                 .thenBy { it.category.name.lowercase() },
         )
+        if (previewLimit <= 0) return sorted
+        return sorted.map { summary ->
+            val previews = channelDao.getPreviewLogosForCategory(
+                sourceId = sourceId,
+                categoryId = summary.category.id,
+                contentType = contentType,
+                limit = previewLimit,
+            ).mapNotNull { it.logoUrl }.distinct()
+            summary.copy(previewImageUrls = previews)
+        }
     }
 
     private suspend fun loadHomeCategoryHighlights(
@@ -668,6 +803,17 @@ class BrowseViewModel @Inject constructor(
         categoryChannelsCache.clearSource(sourceId)
         homeFeedCache.clearSource(sourceId)
         seriesEpisodesCache.clearSource(sourceId)
+    }
+
+    private fun invalidateSectionCaches(sourceId: Long, section: BrowseSection) {
+        sectionFeedCache.clearSection(sourceId, section)
+        section.contentType?.let { contentType ->
+            categoryChannelsCache.clearContentType(sourceId, contentType)
+            if (contentType == ContentType.SERIES) {
+                seriesEpisodesCache.clearSource(sourceId)
+            }
+        }
+        homeFeedCache.clearSource(sourceId)
     }
 
     companion object {

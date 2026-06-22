@@ -43,6 +43,10 @@ class CategoryChannelsCache @Inject constructor() {
         cache.keys.removeAll { key -> key.startsWith("$sourceId:") }
     }
 
+    fun clearContentType(sourceId: Long, contentType: ContentType) {
+        cache.keys.removeAll { key -> key.startsWith("$sourceId:${contentType.name}:") }
+    }
+
     fun clearAll() {
         cache.clear()
     }

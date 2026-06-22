@@ -8,6 +8,7 @@ import androidx.leanback.widget.Presenter
 import com.afifistudio.iptvcinema.R
 import com.afifistudio.iptvcinema.databinding.CardHeroCinematicBinding
 import com.afifistudio.iptvcinema.domain.model.ContentType
+import com.afifistudio.iptvcinema.ui.common.ContentImageBindings.ImageRequestSize
 import com.afifistudio.iptvcinema.ui.common.ContentImageBindings.bindContentImage
 import com.afifistudio.iptvcinema.ui.common.ContentImageBindings.contentTypeForImage
 
@@ -59,7 +60,11 @@ class HeroCardPresenter : Presenter() {
             binding.heroBadge.setBackgroundResource(R.drawable.badge_chip_bg)
         }
 
-        binding.heroImage.bindContentImage(card.imageUrl, card.contentTypeForImage())
+        binding.heroImage.bindContentImage(
+            card.imageUrl,
+            card.contentTypeForImage(),
+            requestSize = ImageRequestSize(width, height),
+        )
 
         root.contentDescription = "${card.title}, ${card.subtitle}"
 

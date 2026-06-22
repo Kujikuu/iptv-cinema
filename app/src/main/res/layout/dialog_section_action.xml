@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/section_action_panel_bg"
+    android:clipToPadding="false"
+    android:orientation="vertical"
+    android:padding="24dp">
+
+    <TextView
+        android:id="@+id/section_action_title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:ellipsize="end"
+        android:includeFontPadding="false"
+        android:maxLines="1"
+        android:textAppearance="@style/TextAppearance.TvIptv.RowHeader"
+        android:textAlignment="viewStart"
+        tools:text="Live TV" />
+
+    <TextView
+        android:id="@+id/section_action_subtitle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:maxLines="2"
+        android:textAppearance="@style/TextAppearance.TvIptv.RowHeaderSubtitle"
+        android:textAlignment="viewStart"
+        tools:text="Updates this section from the active source." />
+
+    <TextView
+        android:id="@+id/section_action_refresh"
+        android:layout_width="match_parent"
+        android:layout_height="56dp"
+        android:layout_marginTop="22dp"
+        android:background="@drawable/details_action_primary"
+        android:drawableStart="@drawable/ic_refresh_small"
+        android:drawablePadding="12dp"
+        android:drawableTint="@color/details_action_primary_text"
+        android:ellipsize="end"
+        android:focusable="true"
+        android:focusableInTouchMode="true"
+        android:gravity="center_vertical"
+        android:maxLines="1"
+        android:paddingHorizontal="18dp"
+        android:textAppearance="@style/TextAppearance.TvIptv.DetailsActionPrimary"
+        android:textAlignment="viewStart"
+        tools:text="Refresh Live TV" />
+
+    <TextView
+        android:id="@+id/section_action_browse"
+        android:layout_width="match_parent"
+        android:layout_height="56dp"
+        android:layout_marginTop="12dp"
+        android:background="@drawable/details_action_secondary"
+        android:ellipsize="end"
+        android:focusable="true"
+        android:focusableInTouchMode="true"
+        android:gravity="center_vertical"
+        android:maxLines="1"
+        android:paddingHorizontal="18dp"
+        android:textAppearance="@style/TextAppearance.TvIptv.DetailsActionSecondary"
+        android:textAlignment="viewStart"
+        tools:text="Browse Live TV" />
+</LinearLayout>

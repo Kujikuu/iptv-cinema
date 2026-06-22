@@ -16,7 +16,7 @@
     </style>
 
     <style name="TextAppearance.TvIptv.RowHeader">
-        <item name="android:textSize">22sp</item>
+        <item name="android:textSize">@dimen/row_header_text_size</item>
         <item name="android:textColor">@color/on_surface</item>
         <item name="android:textStyle">bold</item>
         <item name="android:letterSpacing">0.02</item>
@@ -148,7 +148,7 @@
     </style>
 
     <style name="TextAppearance.TvIptv.LauncherTitle">
-        <item name="android:textSize">22sp</item>
+        <item name="android:textSize">24sp</item>
         <item name="android:textColor">@color/on_surface</item>
         <item name="android:textStyle">bold</item>
     </style>

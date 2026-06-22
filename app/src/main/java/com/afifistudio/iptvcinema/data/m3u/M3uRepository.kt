@@ -66,6 +66,9 @@ class M3uRepository @Inject constructor(
         sourceDao.touch(sourceId)
     }
 
+    override suspend fun refreshSection(sourceId: Long, contentType: ContentType): Result<Unit> =
+        refreshSource(sourceId)
+
     override suspend fun getSeriesEpisodes(sourceId: Long, seriesId: String): Result<List<Episode>> =
         Result.failure(UnsupportedOperationException("Series are not available for M3U playlists"))
 

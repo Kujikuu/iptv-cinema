@@ -38,6 +38,7 @@ class MainActivity : AppCompatActivity(), HomeChromeHost {
     private var settingsClickListener: (() -> Unit)? = null
     private var contentFocusHandler: ContentFocusHandler? = null
     private var lastChromeFocusedViewId: Int = View.NO_ID
+    private var lastBackdropImageUrl: String? = null
 
     private val clockRunnable = object : Runnable {
         override fun run() {
@@ -145,13 +146,19 @@ class MainActivity : AppCompatActivity(), HomeChromeHost {
     }
 
     override fun setBackdropImageUrl(url: String?) {
-        if (url.isNullOrBlank()) {
+        val normalizedUrl = url?.takeIf { it.isNotBlank() }
+        if (normalizedUrl == lastBackdropImageUrl) return
+        lastBackdropImageUrl = normalizedUrl
+        if (normalizedUrl == null) {
             clearBackdropBlur()
             binding.backdropImage.setImageResource(R.drawable.launcher_backdrop_fallback)
             return
         }
-        binding.backdropImage.load(url) {
-            crossfade(true)
+        val width = resources.displayMetrics.widthPixels
+        val height = resources.displayMetrics.heightPixels
+        binding.backdropImage.load(normalizedUrl) {
+            crossfade(false)
+            size(width, height)
             placeholder(R.drawable.launcher_backdrop_fallback)
             error(R.drawable.launcher_backdrop_fallback)
             listener(

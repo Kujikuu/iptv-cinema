@@ -33,9 +33,9 @@
 
             <View
                 android:id="@+id/category_accent_bar"
-                android:layout_width="@dimen/category_accent_width"
-                android:layout_height="match_parent"
-                android:layout_gravity="start"
+                android:layout_width="match_parent"
+                android:layout_height="4dp"
+                android:layout_gravity="bottom"
                 android:background="@drawable/category_accent_bar_muted" />
 
             <View

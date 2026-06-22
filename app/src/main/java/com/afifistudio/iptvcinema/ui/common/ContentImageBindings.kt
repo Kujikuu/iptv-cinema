@@ -10,6 +10,11 @@ import com.afifistudio.iptvcinema.ui.browse.BrowseSection
 
 object ContentImageBindings {
 
+    data class ImageRequestSize(
+        val widthPx: Int,
+        val heightPx: Int,
+    )
+
     /**
      * Drop-in image placeholders (PNG/WebP in `res/drawable-nodpi/`):
      * - placeholder_img_live
@@ -31,13 +36,15 @@ object ContentImageBindings {
         url: String?,
         contentType: ContentType,
         crossfade: Boolean = true,
+        requestSize: ImageRequestSize? = null,
     ) {
         val placeholder = placeholderFor(contentType)
         if (url.isNullOrBlank()) {
             setImageResource(placeholder)
         } else {
             load(url) {
-                if (crossfade) crossfade(true)
+                crossfade(crossfade)
+                requestSize?.let { size(it.widthPx, it.heightPx) }
                 placeholder(placeholder)
                 error(placeholder)
             }

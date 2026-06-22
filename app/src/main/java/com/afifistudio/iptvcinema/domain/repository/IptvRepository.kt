@@ -14,5 +14,6 @@ interface IptvRepository {
     ): Result<List<Channel>>
     suspend fun resolveStreamUrl(channel: Channel): Result<String>
     suspend fun refreshSource(sourceId: Long): Result<Unit>
+    suspend fun refreshSection(sourceId: Long, contentType: ContentType): Result<Unit>
     suspend fun getSeriesEpisodes(sourceId: Long, seriesId: String): Result<List<Episode>>
 }

@@ -8,6 +8,7 @@ import androidx.leanback.widget.Presenter
 import com.afifistudio.iptvcinema.R
 import com.afifistudio.iptvcinema.databinding.CardCategoryBinding
 import com.afifistudio.iptvcinema.domain.model.ContentType
+import com.afifistudio.iptvcinema.ui.common.ContentImageBindings.ImageRequestSize
 import com.afifistudio.iptvcinema.ui.common.ContentImageBindings.bindContentImage
 
 class CategoryCardPresenter : Presenter() {
@@ -48,10 +49,16 @@ class CategoryCardPresenter : Presenter() {
             binding.categoryTypeBadge.isVisible = false
         }
 
-        bindPreview(binding, card.previewImageUrls.firstOrNull() ?: card.imageUrl, contentType ?: ContentType.LIVE)
+        bindPreview(
+            binding = binding,
+            url = card.previewImageUrls.firstOrNull() ?: card.imageUrl,
+            contentType = contentType ?: ContentType.LIVE,
+            requestSize = ImageRequestSize(width, height),
+        )
 
         binding.categoryHint.visibility = View.INVISIBLE
         binding.categoryAccentBar.setBackgroundResource(R.drawable.category_accent_bar_muted)
+        binding.categoryAccentBar.alpha = 0.55f
 
         root.contentDescription = listOfNotNull(
             card.title,
@@ -61,6 +68,11 @@ class CategoryCardPresenter : Presenter() {
 
         root.setOnFocusChangeListener { view, hasFocus ->
             CardFocusHelper.applyCategoryFocus(view, binding.categoryAccentBar, binding.categoryHint, hasFocus)
+            binding.categoryPreview.animate()
+                .scaleX(if (hasFocus) IMAGE_FOCUS_SCALE else 1f)
+                .scaleY(if (hasFocus) IMAGE_FOCUS_SCALE else 1f)
+                .setDuration(CardFocusHelper.FOCUS_ANIMATION_MS)
+                .start()
             binding.categoryCount.visibility = if (hasFocus) View.GONE else (if (card.channelCount != null) View.VISIBLE else View.GONE)
         }
     }
@@ -75,12 +87,20 @@ class CategoryCardPresenter : Presenter() {
         binding.categoryTypeBadge.isVisible = false
         binding.categoryHint.visibility = View.INVISIBLE
         binding.categoryAccentBar.setBackgroundResource(R.drawable.category_accent_bar_muted)
+        binding.categoryAccentBar.alpha = 0.55f
+        binding.categoryPreview.scaleX = 1f
+        binding.categoryPreview.scaleY = 1f
         root.setOnFocusChangeListener(null)
         CardFocusHelper.resetFocus(root)
     }
 
-    private fun bindPreview(binding: CardCategoryBinding, url: String?, contentType: ContentType) {
-        binding.categoryPreview.bindContentImage(url, contentType)
+    private fun bindPreview(
+        binding: CardCategoryBinding,
+        url: String?,
+        contentType: ContentType,
+        requestSize: ImageRequestSize,
+    ) {
+        binding.categoryPreview.bindContentImage(url, contentType, requestSize = requestSize)
         binding.categoryPreview.alpha = 1f
     }
 
@@ -91,4 +111,8 @@ class CategoryCardPresenter : Presenter() {
             ContentType.SERIES -> context.getString(R.string.series_badge)
             ContentType.EPISODE -> context.getString(R.string.episode_badge)
         }
+
+    companion object {
+        private const val IMAGE_FOCUS_SCALE = 1.035f
+    }
 }

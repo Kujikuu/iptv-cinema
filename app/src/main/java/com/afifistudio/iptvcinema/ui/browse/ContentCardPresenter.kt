@@ -11,6 +11,7 @@ import androidx.leanback.widget.Presenter
 import com.afifistudio.iptvcinema.R
 import com.afifistudio.iptvcinema.databinding.CardContentBinding
 import com.afifistudio.iptvcinema.domain.model.ContentType
+import com.afifistudio.iptvcinema.ui.common.ContentImageBindings.ImageRequestSize
 import com.afifistudio.iptvcinema.ui.common.ContentImageBindings.bindContentImage
 import com.afifistudio.iptvcinema.ui.common.ContentImageBindings.contentTypeForImage
 
@@ -62,6 +63,8 @@ class ContentCardPresenter(
         val hasFocusNow = root.hasFocus()
         binding.cardSubtitle.alpha = if (hasFocusNow) 1f else 0f
         binding.cardSubtitle.translationY = if (hasFocusNow) 0f else 8f * density
+        binding.cardImage.scaleX = if (hasFocusNow) IMAGE_FOCUS_SCALE else 1f
+        binding.cardImage.scaleY = if (hasFocusNow) IMAGE_FOCUS_SCALE else 1f
 
         bindWatchProgress(binding, card)
 
@@ -80,14 +83,24 @@ class ContentCardPresenter(
         }
 
         binding.cardFavorite.isVisible = card.isFavorite
+        binding.cardFavorite.alpha = if (hasFocusNow) 1f else 0.88f
 
         binding.cardImage.scaleType = ImageView.ScaleType.CENTER_CROP
-        binding.cardImage.bindContentImage(card.imageUrl, card.contentTypeForImage())
+        binding.cardImage.bindContentImage(
+            card.imageUrl,
+            card.contentTypeForImage(),
+            requestSize = ImageRequestSize(width, height),
+        )
 
         root.contentDescription = listOfNotNull(card.title, card.subtitle, card.badge).joinToString(", ")
 
         root.setOnFocusChangeListener { _, hasFocus ->
             CardFocusHelper.applyContentCardFocus(binding.cardContainer, hasFocus, focusScale)
+            binding.cardImage.animate()
+                .scaleX(if (hasFocus) IMAGE_FOCUS_SCALE else 1f)
+                .scaleY(if (hasFocus) IMAGE_FOCUS_SCALE else 1f)
+                .setDuration(CardFocusHelper.FOCUS_ANIMATION_MS)
+                .start()
             if (subtitleText.isNotBlank()) {
                 val targetAlpha = if (hasFocus) 1f else 0f
                 val targetTranslation = if (hasFocus) 0f else 8f * density
@@ -101,6 +114,12 @@ class ContentCardPresenter(
                 binding.cardBadge.animate()
                     .alpha(if (hasFocus) 1f else 0.5f)
                     .setDuration(150)
+                    .start()
+            }
+            if (card.isFavorite) {
+                binding.cardFavorite.animate()
+                    .alpha(if (hasFocus) 1f else 0.88f)
+                    .setDuration(CardFocusHelper.FOCUS_ANIMATION_MS)
                     .start()
             }
         }
@@ -128,6 +147,9 @@ class ContentCardPresenter(
         binding.cardBadge.isVisible = false
         binding.cardFavorite.isVisible = false
         binding.cardProgressContainer.isVisible = false
+        binding.cardImage.scaleX = 1f
+        binding.cardImage.scaleY = 1f
+        binding.cardFavorite.alpha = 1f
         root.setOnLongClickListener(null)
         root.setOnClickListener(null)
         root.setOnFocusChangeListener(null)
@@ -153,7 +175,11 @@ class ContentCardPresenter(
             binding.cardProgressFill.layoutParams =
                 binding.cardProgressFill.layoutParams.apply {
                     width = fillWidth
-                }
+            }
         }
+    }
+
+    companion object {
+        private const val IMAGE_FOCUS_SCALE = 1.035f
     }
 }

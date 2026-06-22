@@ -51,15 +51,18 @@
                 tools:text="LIVE"
                 tools:visibility="visible" />
 
-            <TextView
+            <ImageView
                 android:id="@+id/card_favorite"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
                 android:layout_gravity="top|end"
                 android:layout_margin="8dp"
-                android:text="♥"
-                android:textColor="@color/primary"
-                android:textSize="18sp"
+                android:background="@drawable/card_favorite_badge_bg"
+                android:contentDescription="@string/remove_favorite"
+                android:padding="7dp"
+                android:scaleType="centerInside"
+                android:src="@drawable/ic_player_favorite_filled"
+                app:tint="@color/primary"
                 android:visibility="gone"
                 tools:visibility="visible" />
 

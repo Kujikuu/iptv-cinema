@@ -37,12 +37,12 @@
     <dimen name="category_accent_width">4dp</dimen>
     <dimen name="category_row_padding_bottom">20dp</dimen>
     <dimen name="chrome_top_bar_height">80dp</dimen>
-    <dimen name="launcher_card_width">244dp</dimen>
-    <dimen name="launcher_card_height">300dp</dimen>
+    <dimen name="launcher_card_width">300dp</dimen>
+    <dimen name="launcher_card_height">328dp</dimen>
     <dimen name="launcher_card_focus_inset">16dp</dimen>
-    <dimen name="launcher_card_spacing">16dp</dimen>
+    <dimen name="launcher_card_spacing">22dp</dimen>
     <dimen name="launcher_card_corner_radius">16dp</dimen>
-    <dimen name="launcher_content_top_padding">88dp</dimen>
+    <dimen name="launcher_content_top_padding">104dp</dimen>
     <dimen name="launcher_content_bottom_padding">32dp</dimen>
     <dimen name="launcher_content_horizontal_padding">48dp</dimen>
     <dimen name="launcher_cw_header_bottom_padding">12dp</dimen>
@@ -51,6 +51,7 @@
     <dimen name="launcher_cw_card_width">240dp</dimen>
     <dimen name="launcher_cw_card_height">135dp</dimen>
     <dimen name="launcher_cw_focus_inset">8dp</dimen>
+    <dimen name="section_action_dialog_width">440dp</dimen>
     <dimen name="chrome_search_min_width">520dp</dimen>
     <dimen name="chrome_search_browse_min_width">300dp</dimen>
     <dimen name="chrome_clock_text_size">48sp</dimen>

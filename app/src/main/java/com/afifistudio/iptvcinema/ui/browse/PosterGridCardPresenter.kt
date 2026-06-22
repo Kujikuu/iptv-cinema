@@ -6,6 +6,7 @@ import androidx.core.view.isVisible
 import androidx.leanback.widget.Presenter
 import com.afifistudio.iptvcinema.R
 import com.afifistudio.iptvcinema.databinding.CardPosterGridBinding
+import com.afifistudio.iptvcinema.ui.common.ContentImageBindings.ImageRequestSize
 import com.afifistudio.iptvcinema.ui.common.ContentImageBindings.bindContentImage
 import com.afifistudio.iptvcinema.ui.common.ContentImageBindings.contentTypeForImage
 
@@ -52,7 +53,11 @@ class PosterGridCardPresenter(
 
         binding.cardFavorite.isVisible = card.isFavorite
 
-        binding.cardImage.bindContentImage(card.imageUrl, card.contentTypeForImage())
+        binding.cardImage.bindContentImage(
+            card.imageUrl,
+            card.contentTypeForImage(),
+            requestSize = ImageRequestSize(width, imageHeight),
+        )
 
         binding.posterFocusTarget.contentDescription = listOfNotNull(card.title, card.badge).joinToString(", ")
 

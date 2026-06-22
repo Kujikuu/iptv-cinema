@@ -39,6 +39,10 @@ class SectionFeedCache @Inject constructor() {
         cache.keys.removeAll { it.sourceId == sourceId }
     }
 
+    fun clearSection(sourceId: Long, section: BrowseSection) {
+        cache.remove(Key(sourceId, section))
+    }
+
     fun clearAll() {
         cache.clear()
     }

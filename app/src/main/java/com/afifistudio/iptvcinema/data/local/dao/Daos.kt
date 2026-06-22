@@ -54,6 +54,9 @@ interface CategoryDao {
 
     @Query("DELETE FROM categories WHERE sourceId = :sourceId")
     suspend fun deleteBySource(sourceId: Long)
+
+    @Query("DELETE FROM categories WHERE sourceId = :sourceId AND contentType = :contentType")
+    suspend fun deleteBySource(sourceId: Long, contentType: ContentType)
 }
 
 @Dao
@@ -136,16 +139,19 @@ interface ChannelDao {
         """
         SELECT * FROM channels
         WHERE sourceId = :sourceId
+            AND categoryId = :categoryId
             AND contentType = :contentType
-            AND categoryId IS NOT NULL
             AND logoUrl IS NOT NULL
             AND logoUrl != ''
-        ORDER BY categoryId ASC, addedAt DESC, sortOrder ASC, name ASC
+        ORDER BY addedAt DESC, sortOrder ASC, name ASC
+        LIMIT :limit
         """,
     )
-    suspend fun getChannelsWithLogosForPreviews(
+    suspend fun getPreviewLogosForCategory(
         sourceId: Long,
+        categoryId: String,
         contentType: ContentType,
+        limit: Int,
     ): List<ChannelEntity>
 
     @Query(
@@ -216,6 +222,9 @@ interface ChannelDao {
 
     @Query("DELETE FROM channels WHERE sourceId = :sourceId")
     suspend fun deleteBySource(sourceId: Long)
+
+    @Query("DELETE FROM channels WHERE sourceId = :sourceId AND contentType = :contentType")
+    suspend fun deleteBySource(sourceId: Long, contentType: ContentType)
 }
 
 @Dao

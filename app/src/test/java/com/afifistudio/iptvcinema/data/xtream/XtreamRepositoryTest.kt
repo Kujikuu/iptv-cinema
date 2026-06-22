@@ -151,6 +151,53 @@ class XtreamRepositoryTest {
     }
 
     @Test
+    fun refreshSection_moviesOnlyReplacesMovieRows() = runBlocking {
+        coEvery { sourceDao.getById(1L) } returns SourceEntity(
+            id = 1L,
+            type = SourceType.XTREAM,
+            name = "Test",
+            url = "http://servx.pro:80",
+            username = "user",
+        )
+        coEvery { credentialStore.getPassword(1L) } returns "pass"
+        coEvery {
+            xtreamApi.getVodCategories(
+                url = "http://servx.pro:80/player_api.php",
+                username = "user",
+                password = "pass",
+            )
+        } returns listOf(XtreamCategoryDto(categoryId = "movies", categoryName = "Movies"))
+        coEvery {
+            xtreamApi.getVodStreams(
+                url = "http://servx.pro:80/player_api.php",
+                username = "user",
+                password = "pass",
+            )
+        } returns listOf(
+            XtreamVodStreamDto(
+                streamId = 77,
+                name = "Film",
+                streamIcon = "",
+                categoryId = "movies",
+                containerExtension = "mp4",
+            ),
+        )
+        coEvery { sourceDao.touch(1L, any()) } returns Unit
+
+        repository.refreshSection(1L, ContentType.MOVIE).getOrThrow()
+
+        coVerify { categoryDao.deleteBySource(1L, ContentType.MOVIE) }
+        coVerify { channelDao.deleteBySource(1L, ContentType.MOVIE) }
+        coVerify { categoryDao.insertAll(match { it.size == 1 && it.first().contentType == ContentType.MOVIE }) }
+        coVerify { channelDao.insertAll(match { it.size == 1 && it.first().contentType == ContentType.MOVIE }) }
+        coVerify { sourceDao.touch(1L, any()) }
+        coVerify(exactly = 0) { xtreamApi.getLiveCategories(any(), any(), any()) }
+        coVerify(exactly = 0) { xtreamApi.getLiveStreams(any(), any(), any()) }
+        coVerify(exactly = 0) { xtreamApi.getSeriesCategories(any(), any(), any()) }
+        coVerify(exactly = 0) { xtreamApi.getSeries(any(), any(), any()) }
+    }
+
+    @Test
     fun getCategories_returnsMappedCategories() = runBlocking {
         coEvery { categoryDao.getBySource(1L) } returns listOf(
             com.afifistudio.iptvcinema.data.local.entity.CategoryEntity(

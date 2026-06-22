@@ -9,7 +9,7 @@ object CardFocusHelper {
     const val CONTENT_FOCUS_SCALE = 1.06f
     private const val FOCUS_SCALE = CONTENT_FOCUS_SCALE
     private const val HERO_FOCUS_SCALE = 1.02f
-    private const val FOCUS_ANIMATION_MS = 150L
+    const val FOCUS_ANIMATION_MS = 170L
 
     fun applyContentCardFocus(view: View, hasFocus: Boolean, scale: Float = FOCUS_SCALE) {
         applyFocus(view, hasFocus, scale)
@@ -34,10 +34,21 @@ object CardFocusHelper {
         if (hasFocus) {
             accentBar.setBackgroundResource(R.drawable.category_accent_bar)
             hintView.visibility = View.VISIBLE
+            hintView.alpha = 0f
         } else {
             accentBar.setBackgroundResource(R.drawable.category_accent_bar_muted)
-            hintView.visibility = View.INVISIBLE
         }
+        accentBar.animate()
+            .alpha(if (hasFocus) 1f else 0.55f)
+            .setDuration(FOCUS_ANIMATION_MS)
+            .start()
+        hintView.animate()
+            .alpha(if (hasFocus) 1f else 0f)
+            .setDuration(FOCUS_ANIMATION_MS)
+            .withEndAction {
+                if (!hasFocus) hintView.visibility = View.INVISIBLE
+            }
+            .start()
     }
 
     fun applySectionTabFocus(view: View, hasFocus: Boolean) {

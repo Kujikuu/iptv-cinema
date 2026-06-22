@@ -51,11 +51,21 @@
                 tools:visibility="visible">
 
                 <ImageView
+                    android:id="@+id/section_update_icon"
                     android:layout_width="14dp"
                     android:layout_height="14dp"
                     android:contentDescription="@null"
                     android:src="@drawable/ic_refresh_small"
                     app:tint="@color/on_surface_secondary" />
+
+                <ProgressBar
+                    android:id="@+id/section_update_progress"
+                    style="@style/Widget.TvIptv.ProgressBar"
+                    android:layout_width="14dp"
+                    android:layout_height="14dp"
+                    android:indeterminate="true"
+                    android:visibility="gone"
+                    tools:visibility="gone" />
 
                 <TextView
                     android:id="@+id/section_update_badge"
@@ -73,10 +83,11 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_gravity="bottom"
+                android:background="@drawable/launcher_card_bottom_panel"
                 android:orientation="vertical"
-                android:paddingHorizontal="16dp"
-                android:paddingTop="36dp"
-                android:paddingBottom="14dp">
+                android:paddingHorizontal="18dp"
+                android:paddingTop="46dp"
+                android:paddingBottom="18dp">
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -86,8 +97,8 @@
 
                     <ImageView
                         android:id="@+id/section_title_icon"
-                        android:layout_width="22dp"
-                        android:layout_height="22dp"
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
                         android:contentDescription="@null"
                         app:tint="@color/primary"
                         tools:src="@drawable/ic_material_live_tv" />
@@ -111,7 +122,7 @@
                     android:id="@+id/section_count"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="30dp"
+                    android:layout_marginStart="32dp"
                     android:layout_marginTop="4dp"
                     android:ellipsize="end"
                     android:includeFontPadding="false"

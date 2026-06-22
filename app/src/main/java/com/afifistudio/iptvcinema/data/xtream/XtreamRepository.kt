@@ -93,6 +93,24 @@ class XtreamRepository @Inject constructor(
         sourceDao.touch(sourceId)
     }
 
+    override suspend fun refreshSection(sourceId: Long, contentType: ContentType): Result<Unit> = runCatching {
+        val source = sourceDao.getById(sourceId)
+            ?: throw IllegalArgumentException("Source not found")
+        if (source.type != SourceType.XTREAM) {
+            throw IllegalArgumentException("Not an Xtream source")
+        }
+        val password = credentialStore.getPassword(sourceId)
+            ?: throw IllegalStateException("Missing credentials")
+        cacheSectionFromApi(
+            baseUrl = source.url.orEmpty(),
+            username = source.username.orEmpty(),
+            password = password,
+            sourceId = sourceId,
+            contentType = contentType,
+        )
+        sourceDao.touch(sourceId)
+    }
+
     override suspend fun getSeriesEpisodes(sourceId: Long, seriesId: String): Result<List<Episode>> =
         runCatching {
             val source = sourceDao.getById(sourceId)
@@ -234,6 +252,108 @@ class XtreamRepository @Inject constructor(
             sourceId,
             liveStreamIds.take(PlayerEpgRepository.PREFETCH_BATCH_SIZE),
         )
+    }
+
+    private suspend fun cacheSectionFromApi(
+        baseUrl: String,
+        username: String,
+        password: String,
+        sourceId: Long,
+        contentType: ContentType,
+    ) {
+        val apiUrl = playerApiUrl(baseUrl)
+        categoryDao.deleteBySource(sourceId, contentType)
+        channelDao.deleteBySource(sourceId, contentType)
+
+        when (contentType) {
+            ContentType.LIVE -> {
+                val categories = xtreamApi.getLiveCategories(apiUrl, username, password)
+                categoryDao.insertAll(
+                    categories.map {
+                        CategoryEntity(
+                            sourceId = sourceId,
+                            externalId = it.categoryId,
+                            name = it.categoryName,
+                            contentType = ContentType.LIVE,
+                        )
+                    },
+                )
+                val streams = xtreamApi.getLiveStreams(apiUrl, username, password)
+                insertMappedBatches(streams) { stream ->
+                    ChannelEntity(
+                        sourceId = sourceId,
+                        externalId = stream.streamId.toString(),
+                        name = stream.name,
+                        logoUrl = stream.streamIcon?.takeIf { it.isNotBlank() },
+                        categoryId = stream.categoryId,
+                        streamUrl = null,
+                        sortOrder = 0,
+                        contentType = ContentType.LIVE,
+                        addedAt = stream.added?.toLongOrNull(),
+                    )
+                }
+                epgRepository.prefetchBatch(
+                    sourceId,
+                    streams.map { it.streamId.toString() }.take(PlayerEpgRepository.PREFETCH_BATCH_SIZE),
+                )
+            }
+            ContentType.MOVIE -> {
+                val categories = xtreamApi.getVodCategories(apiUrl, username, password)
+                categoryDao.insertAll(
+                    categories.map {
+                        CategoryEntity(
+                            sourceId = sourceId,
+                            externalId = it.categoryId,
+                            name = it.categoryName,
+                            contentType = ContentType.MOVIE,
+                        )
+                    },
+                )
+                val streams = xtreamApi.getVodStreams(apiUrl, username, password)
+                insertMappedBatches(streams) { stream ->
+                    ChannelEntity(
+                        sourceId = sourceId,
+                        externalId = stream.streamId.toString(),
+                        name = stream.name,
+                        logoUrl = stream.streamIcon?.takeIf { it.isNotBlank() },
+                        categoryId = stream.categoryId,
+                        streamUrl = null,
+                        sortOrder = 0,
+                        contentType = ContentType.MOVIE,
+                        containerExtension = stream.containerExtension?.takeIf { it.isNotBlank() },
+                        addedAt = stream.added?.toLongOrNull(),
+                    )
+                }
+            }
+            ContentType.SERIES -> {
+                val categories = xtreamApi.getSeriesCategories(apiUrl, username, password)
+                categoryDao.insertAll(
+                    categories.map {
+                        CategoryEntity(
+                            sourceId = sourceId,
+                            externalId = it.categoryId,
+                            name = it.categoryName,
+                            contentType = ContentType.SERIES,
+                        )
+                    },
+                )
+                val seriesList = xtreamApi.getSeries(apiUrl, username, password)
+                insertMappedBatches(seriesList) { series ->
+                    ChannelEntity(
+                        sourceId = sourceId,
+                        externalId = series.seriesId.toString(),
+                        name = series.name,
+                        logoUrl = series.cover?.takeIf { it.isNotBlank() },
+                        categoryId = series.categoryId,
+                        streamUrl = null,
+                        sortOrder = 0,
+                        contentType = ContentType.SERIES,
+                        addedAt = series.lastModified?.toLongOrNull(),
+                    )
+                }
+            }
+            ContentType.EPISODE -> throw IllegalArgumentException("Episodes are refreshed with their series")
+        }
     }
 
     private suspend fun <T> insertMappedBatches(
