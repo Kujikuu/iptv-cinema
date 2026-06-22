@@ -135,24 +135,37 @@ class SeriesDetailsFragment : RowsSupportFragment() {
             .associateBy { it.channel.id }
 
         var highlightRowIndex = -1
-        state.episodes
-            .sortedWith(
+        val isRtl = resources.configuration.layoutDirection == View.LAYOUT_DIRECTION_RTL
+
+        val sortedEpisodes = if (isRtl) {
+            state.episodes.sortedWith(
+                compareBy<Episode> { it.seasonNumber }
+                    .thenBy { it.episodeNumber },
+            )
+        } else {
+            state.episodes.sortedWith(
                 compareByDescending<Episode> { it.seasonNumber }
                     .thenByDescending { it.episodeNumber },
             )
-            .groupBy { it.seasonNumber }
-            .toSortedMap(reverseOrder())
-            .forEach { (season, episodes) ->
-                val rowIndex = rowsAdapter.size()
-                val row = buildSeasonRow(season, episodes, continueWatchingByEpisodeId)
-                rowsAdapter.add(row)
-                if (highlightEpisodeId != null &&
-                    episodes.any { it.id == highlightEpisodeId }
-                ) {
-                    highlightRowIndex = rowIndex
-                    pendingHighlightEpisodeId = highlightEpisodeId
-                }
+        }
+
+        val groupedSeasons = if (isRtl) {
+            sortedEpisodes.groupBy { it.seasonNumber }.toSortedMap()
+        } else {
+            sortedEpisodes.groupBy { it.seasonNumber }.toSortedMap(reverseOrder())
+        }
+
+        groupedSeasons.forEach { (season, episodes) ->
+            val rowIndex = rowsAdapter.size()
+            val row = buildSeasonRow(season, episodes, continueWatchingByEpisodeId)
+            rowsAdapter.add(row)
+            if (highlightEpisodeId != null &&
+                episodes.any { it.id == highlightEpisodeId }
+            ) {
+                highlightRowIndex = rowIndex
+                pendingHighlightEpisodeId = highlightEpisodeId
             }
+        }
 
         if (highlightRowIndex >= 0) {
             val targetRow = highlightRowIndex
