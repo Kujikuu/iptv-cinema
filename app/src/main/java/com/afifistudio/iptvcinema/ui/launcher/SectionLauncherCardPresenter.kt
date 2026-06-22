@@ -74,6 +74,7 @@ class SectionLauncherCardPresenter(
             card.title,
             card.countLabel,
             statusLabel,
+            card.disabledMessage,
             context.getString(R.string.section_refresh_hint),
         )
             .joinToString(", ")

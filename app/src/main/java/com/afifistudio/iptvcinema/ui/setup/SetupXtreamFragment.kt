@@ -8,6 +8,7 @@ import androidx.leanback.widget.GuidanceStylist
 import androidx.leanback.widget.GuidedAction
 import androidx.lifecycle.lifecycleScope
 import com.afifistudio.iptvcinema.R
+import com.afifistudio.iptvcinema.data.repository.SourceImportCoordinator
 import com.afifistudio.iptvcinema.data.repository.SourceRepository
 import com.afifistudio.iptvcinema.data.xtream.XtreamRepository
 import com.afifistudio.iptvcinema.domain.model.SourceType
@@ -25,6 +26,9 @@ class SetupXtreamFragment : GuidedStepSupportFragment() {
 
     @Inject
     lateinit var xtreamRepository: XtreamRepository
+
+    @Inject
+    lateinit var sourceImportCoordinator: SourceImportCoordinator
 
     private var formState = XtreamFormState()
     private var statusMessage: String? = null
@@ -152,7 +156,7 @@ class SetupXtreamFragment : GuidedStepSupportFragment() {
                         username = formState.username.trim(),
                         password = formState.password,
                     )
-                    xtreamRepository.refreshSource(sourceId).getOrThrow()
+                    sourceImportCoordinator.queueXtreamInitialImport(sourceId)
                 }
             }.onSuccess {
                 (activity as? SetupActivity)?.finishSetup()

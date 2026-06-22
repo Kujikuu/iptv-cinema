@@ -199,6 +199,25 @@ val MIGRATION_7_8 = object : Migration(7, 8) {
     }
 }
 
+val MIGRATION_8_9 = object : Migration(8, 9) {
+    override fun migrate(db: SupportSQLiteDatabase) {
+        db.execSQL(
+            """
+            CREATE TABLE IF NOT EXISTS section_import_states (
+                sourceId INTEGER NOT NULL,
+                contentType TEXT NOT NULL,
+                status TEXT NOT NULL,
+                updatedAt INTEGER NOT NULL,
+                startedAt INTEGER,
+                finishedAt INTEGER,
+                errorMessage TEXT,
+                PRIMARY KEY(sourceId, contentType)
+            )
+            """.trimIndent(),
+        )
+    }
+}
+
 val MIGRATION_5_6 = object : Migration(5, 6) {
     override fun migrate(db: SupportSQLiteDatabase) {
         db.execSQL(

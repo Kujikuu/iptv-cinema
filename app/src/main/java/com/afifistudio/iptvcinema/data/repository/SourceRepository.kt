@@ -5,6 +5,7 @@ import com.afifistudio.iptvcinema.data.local.dao.ChannelDao
 import com.afifistudio.iptvcinema.data.local.dao.EpgDao
 import com.afifistudio.iptvcinema.data.local.dao.FavoriteDao
 import com.afifistudio.iptvcinema.data.local.dao.LastWatchedDao
+import com.afifistudio.iptvcinema.data.local.dao.SectionImportStateDao
 import com.afifistudio.iptvcinema.data.local.dao.SourceDao
 import com.afifistudio.iptvcinema.data.local.entity.SourceEntity
 import com.afifistudio.iptvcinema.data.local.toDomain
@@ -24,6 +25,7 @@ class SourceRepository @Inject constructor(
     private val favoriteDao: FavoriteDao,
     private val lastWatchedDao: LastWatchedDao,
     private val epgDao: EpgDao,
+    private val sectionImportStateDao: SectionImportStateDao,
     private val credentialStore: CredentialStore,
 ) {
     fun observeSources(): Flow<List<IptvSourceConfig>> =
@@ -65,6 +67,7 @@ class SourceRepository @Inject constructor(
         favoriteDao.deleteBySource(id)
         lastWatchedDao.deleteBySource(id)
         epgDao.deleteBySource(id)
+        sectionImportStateDao.deleteBySource(id)
         categoryDao.deleteBySource(id)
         channelDao.deleteBySource(id)
         sourceDao.deleteById(id)

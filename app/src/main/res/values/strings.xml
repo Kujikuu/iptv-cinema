@@ -126,6 +126,13 @@
     <string name="section_refreshing">Refreshing</string>
     <string name="section_updated_now">Updated now</string>
     <string name="section_refresh_failed">Refresh failed</string>
+    <string name="section_import_queued">Queued</string>
+    <string name="section_import_loading">Loading</string>
+    <string name="section_import_failed">Load failed</string>
+    <string name="section_still_queued">%1$s is queued</string>
+    <string name="section_still_loading">%1$s is still loading</string>
+    <string name="section_load_failed">%1$s failed to load. Long press OK to refresh.</string>
+    <string name="section_not_ready">%1$s is not ready yet</string>
     <string name="section_refresh_updated">%1$s updated</string>
     <string name="section_refresh_hint">Long press OK for refresh</string>
     <string name="section_refresh_section_only">Updates this section from the active source.</string>

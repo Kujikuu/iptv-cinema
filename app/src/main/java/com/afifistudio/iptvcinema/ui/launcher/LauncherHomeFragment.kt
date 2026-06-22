@@ -53,6 +53,7 @@ import com.afifistudio.iptvcinema.ui.details.SeriesDetailsFragment
 import com.afifistudio.iptvcinema.ui.details.ChannelDetailsFragment
 import com.afifistudio.iptvcinema.ui.player.PlayerActivity
 import com.afifistudio.iptvcinema.domain.model.Channel
+import com.afifistudio.iptvcinema.domain.model.SectionImportStatus
 import androidx.leanback.widget.HorizontalGridView
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.delay
@@ -146,7 +147,7 @@ class LauncherHomeFragment : Fragment() {
     private fun setupGrid() {
         gridAdapter = ArrayObjectAdapter(
             SectionLauncherCardPresenter(
-                onItemClick = { sectionItem -> openSection(sectionItem.section) },
+                onItemClick = { sectionItem -> openSection(sectionItem) },
                 onItemLongPress = { sectionItem -> showSectionActionMenu(sectionItem) },
             ),
         )
@@ -555,6 +556,8 @@ class LauncherHomeFragment : Fragment() {
             iconRes = SectionIcons.forSection(section),
             previewImageUrl = null,
             previewFallbackRes = sectionPreviewFallback(section),
+            isBrowseEnabled = false,
+            disabledMessage = getString(R.string.section_still_loading, title),
         )
     }
 
@@ -639,28 +642,77 @@ class LauncherHomeFragment : Fragment() {
         contentType: ContentType,
         lastUpdate: String?,
     ): SectionLauncherItem {
-        val countLabel = when (section) {
-            BrowseSection.LIVE -> getString(R.string.launcher_count_channels, state.liveCount)
-            BrowseSection.MOVIES -> getString(R.string.launcher_count_titles, state.movieCount)
-            BrowseSection.SERIES -> getString(R.string.launcher_count_series, state.seriesCount)
-            BrowseSection.HOME -> ""
-        }
+        val importState = state.sectionLoadStates[section]
+        val itemCount = countForSection(state, section)
+        val countLabel = sectionCountLabel(section, itemCount, importState?.status)
         val title = when (section) {
             BrowseSection.LIVE -> getString(R.string.section_live)
             BrowseSection.MOVIES -> getString(R.string.section_movies)
             BrowseSection.SERIES -> getString(R.string.section_series)
             BrowseSection.HOME -> getString(R.string.section_home)
         }
+        val isBrowseEnabled = (importState == null || importState.status == SectionImportStatus.READY) && itemCount > 0
+        val disabledMessage = disabledSectionMessage(title, itemCount, importState?.status)
+        val updateLabel = when (importState?.status) {
+            SectionImportStatus.QUEUED -> getString(R.string.section_import_queued)
+            SectionImportStatus.LOADING -> getString(R.string.section_import_loading)
+            SectionImportStatus.ERROR -> getString(R.string.section_import_failed)
+            SectionImportStatus.READY,
+            null -> lastUpdate
+        }
         return SectionLauncherItem(
             section = section,
             title = title,
             countLabel = countLabel,
-            lastUpdateLabel = lastUpdate,
+            lastUpdateLabel = updateLabel,
             refreshStatus = sectionRefreshStatuses[section] ?: SectionRefreshStatus.IDLE,
             iconRes = SectionIcons.forSection(section),
             previewImageUrl = previewForContentType(state, contentType),
             previewFallbackRes = sectionPreviewFallback(section),
+            isBrowseEnabled = isBrowseEnabled,
+            disabledMessage = disabledMessage,
         )
+    }
+
+    private fun countForSection(state: BrowseUiState, section: BrowseSection): Int =
+        when (section) {
+            BrowseSection.LIVE -> state.liveCount
+            BrowseSection.MOVIES -> state.movieCount
+            BrowseSection.SERIES -> state.seriesCount
+            BrowseSection.HOME -> 0
+        }
+
+    private fun sectionCountLabel(
+        section: BrowseSection,
+        count: Int,
+        status: SectionImportStatus?,
+    ): String {
+        return when (status) {
+            SectionImportStatus.QUEUED -> getString(R.string.section_import_queued)
+            SectionImportStatus.LOADING -> getString(R.string.loading)
+            SectionImportStatus.ERROR -> getString(R.string.section_import_failed)
+            SectionImportStatus.READY,
+            null -> when (section) {
+                BrowseSection.LIVE -> getString(R.string.launcher_count_channels, count)
+                BrowseSection.MOVIES -> getString(R.string.launcher_count_titles, count)
+                BrowseSection.SERIES -> getString(R.string.launcher_count_series, count)
+                BrowseSection.HOME -> ""
+            }
+        }
+    }
+
+    private fun disabledSectionMessage(
+        title: String,
+        count: Int,
+        status: SectionImportStatus?,
+    ): String? {
+        return when (status) {
+            SectionImportStatus.QUEUED -> getString(R.string.section_still_queued, title)
+            SectionImportStatus.LOADING -> getString(R.string.section_still_loading, title)
+            SectionImportStatus.ERROR -> getString(R.string.section_load_failed, title)
+            SectionImportStatus.READY,
+            null -> if (count <= 0) getString(R.string.section_not_ready, title) else null
+        }
     }
 
     private fun sectionPreviewFallback(section: BrowseSection): Int = when (section) {
@@ -697,6 +749,19 @@ class LauncherHomeFragment : Fragment() {
         (activity as? HomeChromeHost)?.setBackdropImageUrl(imageUrl)
     }
 
+    private fun openSection(item: SectionLauncherItem) {
+        if (!item.isBrowseEnabled) {
+            Toast.makeText(
+                requireContext(),
+                item.disabledMessage ?: getString(R.string.section_not_ready, item.title),
+                Toast.LENGTH_SHORT,
+            ).show()
+            requestSectionCardFocus(item.section)
+            return
+        }
+        openSection(item.section)
+    }
+
     private fun openSection(section: BrowseSection) {
         browseViewModel.selectSection(section)
         replaceContent(CategoryGridFragment.newInstance(fromLauncher = true))
@@ -731,7 +796,7 @@ class LauncherHomeFragment : Fragment() {
         }
         view.findViewById<TextView>(R.id.section_action_browse).setOnClickListener {
             dialog.dismiss()
-            openSection(item.section)
+            openSection(item)
         }
 
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)

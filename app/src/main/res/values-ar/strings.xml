@@ -126,6 +126,13 @@
     <string name="section_refreshing">جاري التحديث</string>
     <string name="section_updated_now">تم التحديث الآن</string>
     <string name="section_refresh_failed">تعذر التحديث</string>
+    <string name="section_import_queued">في الانتظار</string>
+    <string name="section_import_loading">جاري التحميل</string>
+    <string name="section_import_failed">فشل التحميل</string>
+    <string name="section_still_queued">%1$s في قائمة الانتظار</string>
+    <string name="section_still_loading">%1$s لا يزال قيد التحميل</string>
+    <string name="section_load_failed">فشل تحميل %1$s. اضغط مطولًا على OK للتحديث.</string>
+    <string name="section_not_ready">%1$s غير جاهز بعد</string>
     <string name="section_refresh_updated">تم تحديث %1$s</string>
     <string name="section_refresh_hint">اضغط مطولًا على OK للتحديث</string>
     <string name="section_refresh_section_only">يتم تحديث هذا القسم من المصدر النشط.</string>

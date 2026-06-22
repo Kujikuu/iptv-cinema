@@ -11,6 +11,8 @@ data class SectionLauncherItem(
     val iconRes: Int,
     val previewImageUrl: String? = null,
     val previewFallbackRes: Int,
+    val isBrowseEnabled: Boolean = true,
+    val disabledMessage: String? = null,
 )
 
 enum class SectionRefreshStatus {

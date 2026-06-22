@@ -22,4 +22,10 @@ class MigrationsTest {
         assertEquals(5, MIGRATION_5_6.startVersion)
         assertEquals(6, MIGRATION_5_6.endVersion)
     }
+
+    @Test
+    fun migration8To9_hasExpectedVersionRange() {
+        assertEquals(8, MIGRATION_8_9.startVersion)
+        assertEquals(9, MIGRATION_8_9.endVersion)
+    }
 }

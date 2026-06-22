@@ -6,10 +6,13 @@ import com.afifistudio.iptvcinema.data.cache.SectionFeedCache
 import com.afifistudio.iptvcinema.data.cache.SeriesEpisodesCache
 import com.afifistudio.iptvcinema.data.local.dao.ChannelDao
 import com.afifistudio.iptvcinema.data.local.dao.FavoriteDao
+import com.afifistudio.iptvcinema.data.local.dao.SectionImportStateDao
 import com.afifistudio.iptvcinema.data.local.entity.CategoryCount
 import com.afifistudio.iptvcinema.data.local.entity.ChannelEntity
+import com.afifistudio.iptvcinema.data.local.entity.SectionImportStateEntity
 import com.afifistudio.iptvcinema.data.platform.WatchNextPublisher
 import com.afifistudio.iptvcinema.data.prefs.AppPreferences
+import com.afifistudio.iptvcinema.data.repository.SourceImportCoordinator
 import com.afifistudio.iptvcinema.data.repository.SourceRefreshPolicy
 import com.afifistudio.iptvcinema.data.repository.SourceRepository
 import com.afifistudio.iptvcinema.data.repository.WatchHistoryRepository
@@ -30,6 +33,7 @@ import io.mockk.unmockkStatic
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.CompletableDeferred
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.resetMain
@@ -57,10 +61,13 @@ class BrowseViewModelTest {
     private val seriesEpisodesCache = SeriesEpisodesCache()
     private val channelDao = mockk<ChannelDao>()
     private val favoriteDao = mockk<FavoriteDao>(relaxed = true)
+    private val sectionImportStateDao = mockk<SectionImportStateDao>(relaxed = true)
+    private val sourceImportCoordinator = mockk<SourceImportCoordinator>(relaxed = true)
     private val watchHistoryRepository = mockk<WatchHistoryRepository>(relaxed = true)
     private val appPreferences = mockk<AppPreferences>(relaxed = true)
     private val watchNextPublisher = mockk<WatchNextPublisher>(relaxed = true)
     private val repository = mockk<IptvRepository>()
+    private val sectionImportStates = MutableStateFlow(emptyList<SectionImportStateEntity>())
 
     private val source = IptvSourceConfig(
         id = 1L,
@@ -86,6 +93,11 @@ class BrowseViewModelTest {
         every { Dispatchers.IO } returns dispatcher
         coEvery { sourceRepository.getSources() } returns listOf(source)
         coEvery { sourceRepository.getSource(1L) } returns source
+        every { sectionImportStateDao.observeBySource(1L) } returns sectionImportStates
+        coEvery { sectionImportStateDao.getBySource(1L) } returns emptyList()
+        coEvery { sourceImportCoordinator.ensurePendingImportsRunning(1L) } returns Unit
+        coEvery { sourceImportCoordinator.queueXtreamInitialImport(1L) } returns Unit
+        coEvery { sourceImportCoordinator.refreshSection(1L, any()) } returns Result.success(Unit)
         every { appPreferences.getSelectedSourceId() } returns null
         coEvery { watchNextPublisher.sync() } returns Unit
         coEvery { sourceRefreshPolicy.shouldRefreshFromNetwork(any(), any()) } returns false
@@ -191,6 +203,24 @@ class BrowseViewModelTest {
         assertFalse(state.isBootstrapLoading)
         assertTrue(state.sources.isEmpty())
         assertNull(state.featuredChannel)
+    }
+
+    @Test
+    fun loadInitial_withEmptyXtreamSourceQueuesImportWithoutBlockingHome() = runTest {
+        val xtreamSource = source.copy(type = SourceType.XTREAM, url = "http://example.com", username = "user")
+        coEvery { sourceRepository.getSources() } returns listOf(xtreamSource)
+        coEvery { sourceRepository.getSource(1L) } returns xtreamSource
+        coEvery { channelDao.countAllBySource(1L) } returns 0
+        coEvery { channelDao.countBySource(1L, ContentType.LIVE) } returns 0
+        coEvery { channelDao.countBySource(1L, ContentType.MOVIE) } returns 0
+        coEvery { channelDao.countBySource(1L, ContentType.SERIES) } returns 0
+
+        val viewModel = createViewModel()
+        advanceUntilIdle()
+
+        coVerify { sourceImportCoordinator.queueXtreamInitialImport(1L) }
+        assertFalse(viewModel.uiState.value.isBootstrapLoading)
+        assertEquals("Test Source", viewModel.uiState.value.activeSourceName)
     }
 
     @Test
@@ -426,6 +456,8 @@ class BrowseViewModelTest {
             seriesEpisodesCache,
             channelDao,
             favoriteDao,
+            sectionImportStateDao,
+            sourceImportCoordinator,
             watchHistoryRepository,
             appPreferences,
             watchNextPublisher,

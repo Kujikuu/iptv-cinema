@@ -9,14 +9,17 @@ import com.afifistudio.iptvcinema.data.local.dao.ChannelDao
 import com.afifistudio.iptvcinema.data.local.dao.FavoriteDao
 import com.afifistudio.iptvcinema.data.local.dao.LastWatchedDao
 import com.afifistudio.iptvcinema.data.local.dao.EpgDao
+import com.afifistudio.iptvcinema.data.local.dao.SectionImportStateDao
 import com.afifistudio.iptvcinema.data.local.dao.SourceDao
 import com.afifistudio.iptvcinema.data.local.entity.CategoryEntity
 import com.afifistudio.iptvcinema.data.local.entity.ChannelEntity
 import com.afifistudio.iptvcinema.data.local.entity.FavoriteEntity
 import com.afifistudio.iptvcinema.data.local.entity.LastWatchedEntity
 import com.afifistudio.iptvcinema.data.local.entity.EpgProgramEntity
+import com.afifistudio.iptvcinema.data.local.entity.SectionImportStateEntity
 import com.afifistudio.iptvcinema.data.local.entity.SourceEntity
 import com.afifistudio.iptvcinema.domain.model.ContentType
+import com.afifistudio.iptvcinema.domain.model.SectionImportStatus
 import com.afifistudio.iptvcinema.domain.model.SourceType
 
 class SourceTypeConverters {
@@ -35,6 +38,14 @@ class ContentTypeConverters {
     fun toContentType(value: String): ContentType = ContentType.valueOf(value)
 }
 
+class SectionImportStatusConverters {
+    @TypeConverter
+    fun fromSectionImportStatus(value: SectionImportStatus): String = value.name
+
+    @TypeConverter
+    fun toSectionImportStatus(value: String): SectionImportStatus = SectionImportStatus.valueOf(value)
+}
+
 @Database(
     entities = [
         SourceEntity::class,
@@ -43,11 +54,16 @@ class ContentTypeConverters {
         FavoriteEntity::class,
         LastWatchedEntity::class,
         EpgProgramEntity::class,
+        SectionImportStateEntity::class,
     ],
-    version = 8,
+    version = 9,
     exportSchema = true,
 )
-@TypeConverters(SourceTypeConverters::class, ContentTypeConverters::class)
+@TypeConverters(
+    SourceTypeConverters::class,
+    ContentTypeConverters::class,
+    SectionImportStatusConverters::class,
+)
 abstract class AppDatabase : RoomDatabase() {
     abstract fun sourceDao(): SourceDao
     abstract fun categoryDao(): CategoryDao
@@ -55,4 +71,5 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun favoriteDao(): FavoriteDao
     abstract fun lastWatchedDao(): LastWatchedDao
     abstract fun epgDao(): EpgDao
+    abstract fun sectionImportStateDao(): SectionImportStateDao
 }

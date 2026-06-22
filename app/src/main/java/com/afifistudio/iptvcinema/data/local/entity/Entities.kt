@@ -4,6 +4,7 @@ import androidx.room.Entity
 import androidx.room.Index
 import androidx.room.PrimaryKey
 import com.afifistudio.iptvcinema.domain.model.ContentType
+import com.afifistudio.iptvcinema.domain.model.SectionImportStatus
 import com.afifistudio.iptvcinema.domain.model.SourceType
 
 @Entity(tableName = "sources")
@@ -50,6 +51,20 @@ data class ChannelEntity(
     val plot: String? = null,
     val addedAt: Long? = null,
     val channelNumber: Int? = null,
+)
+
+@Entity(
+    tableName = "section_import_states",
+    primaryKeys = ["sourceId", "contentType"],
+)
+data class SectionImportStateEntity(
+    val sourceId: Long,
+    val contentType: ContentType,
+    val status: SectionImportStatus,
+    val updatedAt: Long = System.currentTimeMillis(),
+    val startedAt: Long? = null,
+    val finishedAt: Long? = null,
+    val errorMessage: String? = null,
 )
 
 @Entity(

@@ -13,6 +13,7 @@ import com.afifistudio.iptvcinema.data.local.entity.FavoriteEntity
 import com.afifistudio.iptvcinema.data.local.entity.LastWatchedEntity
 import com.afifistudio.iptvcinema.data.local.entity.LastWatchedRow
 import com.afifistudio.iptvcinema.data.local.entity.EpgProgramEntity
+import com.afifistudio.iptvcinema.data.local.entity.SectionImportStateEntity
 import com.afifistudio.iptvcinema.data.local.entity.SourceEntity
 import com.afifistudio.iptvcinema.domain.model.ContentType
 import kotlinx.coroutines.flow.Flow
@@ -225,6 +226,30 @@ interface ChannelDao {
 
     @Query("DELETE FROM channels WHERE sourceId = :sourceId AND contentType = :contentType")
     suspend fun deleteBySource(sourceId: Long, contentType: ContentType)
+}
+
+@Dao
+interface SectionImportStateDao {
+    @Query("SELECT * FROM section_import_states WHERE sourceId = :sourceId")
+    fun observeBySource(sourceId: Long): Flow<List<SectionImportStateEntity>>
+
+    @Query("SELECT * FROM section_import_states WHERE sourceId = :sourceId")
+    suspend fun getBySource(sourceId: Long): List<SectionImportStateEntity>
+
+    @Query(
+        "SELECT * FROM section_import_states WHERE sourceId = :sourceId " +
+            "AND contentType = :contentType LIMIT 1",
+    )
+    suspend fun get(sourceId: Long, contentType: ContentType): SectionImportStateEntity?
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun upsert(state: SectionImportStateEntity)
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun upsertAll(states: List<SectionImportStateEntity>)
+
+    @Query("DELETE FROM section_import_states WHERE sourceId = :sourceId")
+    suspend fun deleteBySource(sourceId: Long)
 }
 
 @Dao

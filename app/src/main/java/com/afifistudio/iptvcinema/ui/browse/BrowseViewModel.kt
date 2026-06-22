@@ -9,10 +9,12 @@ import com.afifistudio.iptvcinema.data.cache.SectionFeedCache
 import com.afifistudio.iptvcinema.data.cache.SeriesEpisodesCache
 import com.afifistudio.iptvcinema.data.local.dao.ChannelDao
 import com.afifistudio.iptvcinema.data.local.dao.FavoriteDao
+import com.afifistudio.iptvcinema.data.local.dao.SectionImportStateDao
 import com.afifistudio.iptvcinema.data.local.entity.FavoriteEntity
 import com.afifistudio.iptvcinema.data.local.toDomain
 import com.afifistudio.iptvcinema.data.platform.WatchNextPublisher
 import com.afifistudio.iptvcinema.data.prefs.AppPreferences
+import com.afifistudio.iptvcinema.data.repository.SourceImportCoordinator
 import com.afifistudio.iptvcinema.data.repository.SourceRepository
 import com.afifistudio.iptvcinema.data.repository.WatchHistoryRepository
 import com.afifistudio.iptvcinema.data.repository.SourceRefreshPolicy
@@ -21,6 +23,8 @@ import com.afifistudio.iptvcinema.domain.model.ContentType
 import com.afifistudio.iptvcinema.domain.model.IptvSourceConfig
 import com.afifistudio.iptvcinema.domain.model.Category
 import com.afifistudio.iptvcinema.domain.model.Channel
+import com.afifistudio.iptvcinema.domain.model.SectionImportState
+import com.afifistudio.iptvcinema.domain.model.SourceType
 import com.afifistudio.iptvcinema.domain.repository.IptvRepositoryFactory
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
@@ -30,7 +34,9 @@ import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
@@ -60,6 +66,7 @@ data class BrowseUiState(
     val liveCount: Int = 0,
     val movieCount: Int = 0,
     val seriesCount: Int = 0,
+    val sectionLoadStates: Map<BrowseSection, SectionImportState> = emptyMap(),
     val sourceUpdatedAt: Long = 0L,
     val activeSourceName: String = "",
 )
@@ -75,6 +82,8 @@ class BrowseViewModel @Inject constructor(
     private val seriesEpisodesCache: SeriesEpisodesCache,
     private val channelDao: ChannelDao,
     private val favoriteDao: FavoriteDao,
+    private val sectionImportStateDao: SectionImportStateDao,
+    private val sourceImportCoordinator: SourceImportCoordinator,
     private val watchHistoryRepository: WatchHistoryRepository,
     private val appPreferences: AppPreferences,
     private val watchNextPublisher: WatchNextPublisher,
@@ -83,6 +92,7 @@ class BrowseViewModel @Inject constructor(
     private val _uiState = MutableStateFlow(BrowseUiState())
     val uiState: StateFlow<BrowseUiState> = _uiState.asStateFlow()
     private var sectionWarmJob: kotlinx.coroutines.Job? = null
+    private var sectionImportStateJob: Job? = null
 
     init {
         loadInitial()
@@ -102,12 +112,14 @@ class BrowseViewModel @Inject constructor(
                 withContext(Dispatchers.IO) {
                     val sources = sourceRepository.getSources()
                     if (sources.isEmpty()) {
+                        sectionImportStateJob?.cancel()
                         _uiState.update {
                             it.copy(
                                 isLoading = false,
                                 isBootstrapLoading = false,
                                 isHomeRowsLoading = false,
                                 sources = emptyList(),
+                                sectionLoadStates = emptyMap(),
                                 error = null,
                             )
                         }
@@ -167,6 +179,7 @@ class BrowseViewModel @Inject constructor(
                 val sources = sourceRepository.getSources()
                 if (sources.isEmpty()) {
                     appPreferences.setSelectedSourceId(null)
+                    sectionImportStateJob?.cancel()
                     _uiState.update {
                         it.copy(
                             isLoading = false,
@@ -174,6 +187,7 @@ class BrowseViewModel @Inject constructor(
                             isHomeRowsLoading = false,
                             sources = emptyList(),
                             selectedSourceId = null,
+                            sectionLoadStates = emptyMap(),
                             activeSourceName = "",
                         )
                     }
@@ -294,9 +308,13 @@ class BrowseViewModel @Inject constructor(
             runCatching {
                 withContext(Dispatchers.IO) {
                     val sourceType = sourceRepository.getSource(sourceId)?.type
-                    repositoryFactory.forSource(sourceId)
-                        .refreshSection(sourceId, contentType)
-                        .getOrThrow()
+                    if (sourceType == SourceType.XTREAM) {
+                        sourceImportCoordinator.refreshSection(sourceId, contentType).getOrThrow()
+                    } else {
+                        repositoryFactory.forSource(sourceId)
+                            .refreshSection(sourceId, contentType)
+                            .getOrThrow()
+                    }
                     if (sourceType == com.afifistudio.iptvcinema.domain.model.SourceType.XTREAM) {
                         invalidateSectionCaches(sourceId, section)
                     } else {
@@ -469,6 +487,51 @@ class BrowseViewModel @Inject constructor(
             .orEmpty()
             .associate { it.id to it.name }
 
+    private fun observeSectionImportStates(sourceId: Long) {
+        sectionImportStateJob?.cancel()
+        sectionImportStateJob = viewModelScope.launch {
+            sectionImportStateDao.observeBySource(sourceId).collectLatest { states ->
+                if (_uiState.value.selectedSourceId != sourceId) return@collectLatest
+                if (states.isEmpty()) {
+                    _uiState.update { it.copy(sectionLoadStates = emptyMap()) }
+                    return@collectLatest
+                }
+                val mappedStates = states
+                    .map { it.toDomain() }
+                    .mapNotNull { state ->
+                        browseSectionForContentType(state.contentType)?.let { section -> section to state }
+                    }
+                    .toMap()
+                _uiState.update { it.copy(sectionLoadStates = mappedStates) }
+                withContext(Dispatchers.IO) {
+                    val refreshedSources = sourceRepository.getSources()
+                    _uiState.update { it.copy(sources = refreshedSources) }
+                    publishSourceCounts(sourceId)
+                    if (_uiState.value.selectedSection == BrowseSection.HOME) {
+                        reloadFeedData(sourceId, BrowseSection.HOME)
+                    }
+                }
+            }
+        }
+    }
+
+    private suspend fun ensureXtreamInitialImportQueued(sourceId: Long) {
+        val states = sectionImportStateDao.getBySource(sourceId)
+        if (states.isEmpty()) {
+            sourceImportCoordinator.queueXtreamInitialImport(sourceId)
+        } else {
+            sourceImportCoordinator.ensurePendingImportsRunning(sourceId)
+        }
+    }
+
+    private fun browseSectionForContentType(contentType: ContentType): BrowseSection? =
+        when (contentType) {
+            ContentType.LIVE -> BrowseSection.LIVE
+            ContentType.MOVIE -> BrowseSection.MOVIES
+            ContentType.SERIES -> BrowseSection.SERIES
+            ContentType.EPISODE -> null
+        }
+
     suspend fun getAllFavorites(sourceId: Long): List<Channel> {
         val categoryNames = repositoryFactory.forSource(sourceId)
             .getCategories(sourceId, null)
@@ -506,13 +569,17 @@ class BrowseViewModel @Inject constructor(
             )
         }
         appPreferences.setSelectedSourceId(sourceId)
+        observeSectionImportStates(sourceId)
 
         runCatching {
             val repository = repositoryFactory.forSource(sourceId)
             val source = sourceRepository.getSource(sourceId)
             val channelCount = channelDao.countAllBySource(sourceId)
             val updatedAt = source?.updatedAt ?: 0L
-            if (sourceRefreshPolicy.shouldRefreshFromNetwork(channelCount, updatedAt)) {
+            val isEmptyXtreamSource = source?.type == SourceType.XTREAM && channelCount == 0
+            if (isEmptyXtreamSource) {
+                ensureXtreamInitialImportQueued(sourceId)
+            } else if (sourceRefreshPolicy.shouldRefreshFromNetwork(channelCount, updatedAt)) {
                 repository.refreshSource(sourceId).getOrThrow()
                 invalidateSourceCaches(sourceId)
             }

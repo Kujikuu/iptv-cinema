@@ -12,6 +12,7 @@ import com.afifistudio.iptvcinema.data.local.MIGRATION_4_5
 import com.afifistudio.iptvcinema.data.local.MIGRATION_5_6
 import com.afifistudio.iptvcinema.data.local.MIGRATION_6_7
 import com.afifistudio.iptvcinema.data.local.MIGRATION_7_8
+import com.afifistudio.iptvcinema.data.local.MIGRATION_8_9
 import com.afifistudio.iptvcinema.data.m3u.M3uParser
 import com.afifistudio.iptvcinema.data.xtream.XtreamApi
 import dagger.Module
@@ -66,6 +67,7 @@ object AppModule {
         MIGRATION_5_6,
         MIGRATION_6_7,
         MIGRATION_7_8,
+        MIGRATION_8_9,
     ).build()
 
     @Provides
@@ -85,6 +87,9 @@ object AppModule {
 
     @Provides
     fun provideEpgDao(database: AppDatabase) = database.epgDao()
+
+    @Provides
+    fun provideSectionImportStateDao(database: AppDatabase) = database.sectionImportStateDao()
 
     @Provides
     @Singleton
