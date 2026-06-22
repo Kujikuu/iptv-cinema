@@ -9,7 +9,9 @@ import com.afifistudio.iptvcinema.databinding.CardPosterGridBinding
 import com.afifistudio.iptvcinema.ui.common.ContentImageBindings.bindContentImage
 import com.afifistudio.iptvcinema.ui.common.ContentImageBindings.contentTypeForImage
 
-class PosterGridCardPresenter : Presenter() {
+class PosterGridCardPresenter(
+    private val onLongPress: ((BrowseItem) -> Unit)? = null,
+) : Presenter() {
 
     override fun onCreateViewHolder(parent: ViewGroup): ViewHolder {
         val binding = CardPosterGridBinding.inflate(LayoutInflater.from(parent.context), parent, false)
@@ -57,6 +59,15 @@ class PosterGridCardPresenter : Presenter() {
         viewHolder.view.setOnFocusChangeListener { _, hasFocus ->
             CardFocusHelper.applyPosterGridFocus(binding.cardContainer, hasFocus)
         }
+
+        viewHolder.view.setOnLongClickListener {
+            if (card.type == BrowseItemType.CHANNEL) {
+                onLongPress?.invoke(card)
+                true
+            } else {
+                false
+            }
+        }
     }
 
     override fun onUnbindViewHolder(viewHolder: ViewHolder) {
@@ -66,6 +77,7 @@ class PosterGridCardPresenter : Presenter() {
         binding.cardBadge.isVisible = false
         binding.cardFavorite.isVisible = false
         viewHolder.view.setOnFocusChangeListener(null)
+        viewHolder.view.setOnLongClickListener(null)
         CardFocusHelper.resetFocus(binding.cardContainer)
     }
 }

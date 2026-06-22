@@ -169,6 +169,7 @@ class LauncherHomeFragment : Fragment() {
 
     private fun setupContinueWatchingGrid() {
         val contentCardPresenter = ContentCardPresenter(
+            onLongPress = ::onEpisodeLongPress,
             onClick = { item -> handleContinueWatchingClick(item) },
         )
         continueWatchingAdapter = ArrayObjectAdapter(contentCardPresenter)
@@ -194,6 +195,7 @@ class LauncherHomeFragment : Fragment() {
 
     private fun setupFavoritesGrid() {
         val contentCardPresenter = ContentCardPresenter(
+            onLongPress = ::onEpisodeLongPress,
             onClick = { item -> handleContentClick(item) },
         )
         favoritesAdapter = ArrayObjectAdapter(contentCardPresenter)
@@ -219,6 +221,7 @@ class LauncherHomeFragment : Fragment() {
 
     private fun setupRecommendationsGrid() {
         val contentCardPresenter = ContentCardPresenter(
+            onLongPress = ::onEpisodeLongPress,
             onClick = { item -> handleContentClick(item) },
         )
         recommendationsAdapter = ArrayObjectAdapter(contentCardPresenter)
@@ -510,6 +513,12 @@ class LauncherHomeFragment : Fragment() {
             ContentType.SERIES -> replaceContent(SeriesDetailsFragment.newInstance(channel))
             ContentType.EPISODE -> replaceContent(ChannelDetailsFragment.newInstance(channel))
         }
+    }
+
+    private fun onEpisodeLongPress(item: BrowseItem) {
+        val channel = item.channel ?: return
+        if (channel.contentType != ContentType.EPISODE) return
+        replaceContent(SeriesDetailsFragment.newInstance(channel.toSeriesChannel(), highlightEpisodeId = channel.id))
     }
 
     private fun showPlaceholderSections() {

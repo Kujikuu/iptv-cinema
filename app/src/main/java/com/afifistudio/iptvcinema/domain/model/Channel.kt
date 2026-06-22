@@ -30,4 +30,19 @@ data class Channel(
         seriesId = seriesId,
         seriesName = seriesName,
     )
+
+    /**
+     * Reconstructs a SERIES-type [Channel] from an EPISODE channel.
+     * The episode's [seriesId] is used as both the id and externalId so that
+     * [SeriesDetailsFragment] can load the correct episode list.
+     */
+    fun toSeriesChannel(): Channel = copy(
+        id = seriesId ?: id,
+        name = seriesName ?: name,
+        externalId = seriesId ?: externalId,
+        contentType = ContentType.SERIES,
+        containerExtension = null,
+        seriesId = null,
+        seriesName = null,
+    )
 }

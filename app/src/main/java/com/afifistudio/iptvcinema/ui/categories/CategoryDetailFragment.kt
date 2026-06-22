@@ -52,8 +52,8 @@ class CategoryDetailFragment : Fragment() {
     private val binding get() = _binding!!
     private lateinit var gridAdapter: ArrayObjectAdapter
     private lateinit var bridgeAdapter: ItemBridgeAdapter
-    private val posterCardPresenter = PosterGridCardPresenter()
-    private val liveCardPresenter = ContentCardPresenter()
+    private val posterCardPresenter by lazy { PosterGridCardPresenter(onLongPress = ::onEpisodeLongPress) }
+    private val liveCardPresenter by lazy { ContentCardPresenter(onLongPress = ::onEpisodeLongPress) }
     private lateinit var contentType: ContentType
     private var renderedChannelIds: List<String> = emptyList()
     private var renderedFavoriteIds: Set<String> = emptySet()
@@ -260,12 +260,17 @@ class CategoryDetailFragment : Fragment() {
 
     private fun openContent(channel: Channel) {
         when (channel.contentType) {
-            ContentType.LIVE, ContentType.MOVIE -> {
+            ContentType.LIVE, ContentType.MOVIE ->
                 startActivity(PlayerActivity.createIntent(requireContext(), channel, channel.categoryId))
-            }
             ContentType.SERIES -> replaceContent(SeriesDetailsFragment.newInstance(channel))
             ContentType.EPISODE -> replaceContent(ChannelDetailsFragment.newInstance(channel))
         }
+    }
+
+    private fun onEpisodeLongPress(item: BrowseItem) {
+        val channel = item.channel ?: return
+        if (channel.contentType != ContentType.EPISODE) return
+        replaceContent(SeriesDetailsFragment.newInstance(channel.toSeriesChannel(), highlightEpisodeId = channel.id))
     }
 
     private fun readCategoryArg(): Category {

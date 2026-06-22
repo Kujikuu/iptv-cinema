@@ -40,7 +40,7 @@ class LibraryListFragment : VerticalGridSupportFragment() {
     private val browseViewModel: BrowseViewModel by viewModels({ requireActivity() })
     private lateinit var libraryType: LibraryType
     private lateinit var gridAdapter: ArrayObjectAdapter
-    private val contentCardPresenter = ContentCardPresenter()
+    private val contentCardPresenter by lazy { ContentCardPresenter(onLongPress = ::onEpisodeLongPress) }
     private var continueWatchingItems: List<ContinueWatchingItem> = emptyList()
     private var hasInitialFocus = false
     private val gridColumns = 4
@@ -206,6 +206,12 @@ class LibraryListFragment : VerticalGridSupportFragment() {
         lifecycleScope.launch {
             continueWatchingNavigator.openItem(this@LibraryListFragment, cwItem)
         }
+    }
+
+    private fun onEpisodeLongPress(item: BrowseItem) {
+        val channel = item.channel ?: return
+        if (channel.contentType != ContentType.EPISODE) return
+        replaceContent(SeriesDetailsFragment.newInstance(channel.toSeriesChannel(), highlightEpisodeId = channel.id))
     }
 
     companion object {

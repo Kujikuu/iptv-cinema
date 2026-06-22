@@ -37,7 +37,7 @@ class ChannelSearchFragment : SearchSupportFragment() {
 
     private val viewModel: SearchViewModel by viewModels()
     private val rowsAdapter = ArrayObjectAdapter(StreamingRowPresenter())
-    private val cardPresenter = ContentCardPresenter()
+    private val cardPresenter by lazy { ContentCardPresenter(onLongPress = ::onEpisodeLongPress) }
     private var resultsGridView: VerticalGridView? = null
     private var selectedResultsRow = 0
 
@@ -158,6 +158,12 @@ class ChannelSearchFragment : SearchSupportFragment() {
             else -> ChannelDetailsFragment.newInstance(channel)
         }
         replaceContent(fragment)
+    }
+
+    private fun onEpisodeLongPress(item: BrowseItem) {
+        val channel = item.channel ?: return
+        if (channel.contentType != ContentType.EPISODE) return
+        replaceContent(SeriesDetailsFragment.newInstance(channel.toSeriesChannel(), highlightEpisodeId = channel.id))
     }
 
     private fun badgeFor(contentType: ContentType): String = when (contentType) {
