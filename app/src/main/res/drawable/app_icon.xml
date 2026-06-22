@@ -1,16 +1,49 @@
 <?xml version="1.0" encoding="utf-8"?>
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
-    android:width="48dp"
-    android:height="48dp"
-    android:viewportWidth="48"
-    android:viewportHeight="48">
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+
+    <!-- Background -->
     <path
-        android:fillColor="#0B0B0B"
-        android:pathData="M0,0h48v48h-48z" />
+        android:fillColor="#111827"
+        android:pathData="M12,12
+                          h84
+                          a12,12 0 0 1 12,12
+                          v60
+                          a12,12 0 0 1 -12,12
+                          h-84
+                          a12,12 0 0 1 -12,-12
+                          v-60
+                          a12,12 0 0 1 12,-12z"/>
+
+    <!-- TV Stand -->
+    <path
+        android:fillColor="#374151"
+        android:pathData="M44,84 h20 v6 h-20z"/>
+
+    <!-- TV Frame -->
+    <path
+        android:fillColor="#1F2937"
+        android:pathData="M22,24
+                          h64
+                          a6,6 0 0 1 6,6
+                          v36
+                          a6,6 0 0 1 -6,6
+                          h-64
+                          a6,6 0 0 1 -6,-6
+                          v-36
+                          a6,6 0 0 1 6,-6z"/>
+
+    <!-- Screen -->
     <path
         android:fillColor="#E50914"
-        android:pathData="M4,4h40v40h-40z" />
+        android:pathData="M26,28 h56 a4,4 0 0 1 4,4 v28 a4,4 0 0 1 -4,4 h-56 a4,4 0 0 1 -4,-4 v-28 a4,4 0 0 1 4,-4z"/>
+
+    <!-- Play Button -->
     <path
         android:fillColor="#FFFFFF"
-        android:pathData="M18,14 L18,34 L34,24 Z" />
+        android:pathData="M45,39 L45,57 L63,48 Z"/>
+
 </vector>
