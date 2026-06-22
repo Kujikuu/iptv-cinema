@@ -83,12 +83,7 @@ class CategoryDetailFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        binding.root.setPadding(
-            0,
-            resources.getDimensionPixelSize(R.dimen.browse_content_top_padding),
-            0,
-            0,
-        )
+        binding.root.setPadding(0, 0, 0, 0)
         val category = readCategoryArg()
         val sourceUpdatedAt = requireArguments().getLong(ARG_SOURCE_UPDATED_AT, 0L)
         contentType = category.contentType

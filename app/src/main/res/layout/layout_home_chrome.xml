@@ -12,6 +12,7 @@
         android:id="@+id/chrome_top_bar"
         android:layout_width="match_parent"
         android:layout_height="@dimen/chrome_top_bar_height"
+        android:background="@drawable/chrome_top_bar_bg"
         android:paddingHorizontal="@dimen/row_padding_horizontal">
 
         <TextView
