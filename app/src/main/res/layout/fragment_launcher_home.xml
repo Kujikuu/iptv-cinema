@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <com.afifistudio.iptvcinema.ui.common.TvNestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/launcher_scroll"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -17,6 +18,8 @@
         android:clipToPadding="false"
         android:orientation="vertical"
         android:paddingTop="@dimen/launcher_content_top_padding">
+
+
 
         <androidx.leanback.widget.HorizontalGridView
             android:id="@+id/launcher_grid"

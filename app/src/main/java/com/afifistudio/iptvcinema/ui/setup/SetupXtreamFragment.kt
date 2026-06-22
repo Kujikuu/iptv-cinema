@@ -98,6 +98,7 @@ class SetupXtreamFragment : GuidedStepSupportFragment() {
         )
     }
 
+    @Deprecated("Deprecated in parent")
     override fun onGuidedActionEdited(action: GuidedAction) {
         syncActionToForm(action)
     }
@@ -111,11 +112,23 @@ class SetupXtreamFragment : GuidedStepSupportFragment() {
         if (action.id != ACTION_SAVE) return
 
         syncAllActionsToForm()
-        val validationError = validateForm()
-        if (validationError != null) {
-            showStatus(validationError)
-            return
+        clearErrors()
+
+        var hasError = false
+        if (formState.serverUrl.isBlank()) {
+            showFieldError(ACTION_SERVER, getString(R.string.setup_error_empty_server))
+            hasError = true
         }
+        if (formState.username.isBlank()) {
+            showFieldError(ACTION_USERNAME, getString(R.string.setup_error_empty_username))
+            hasError = true
+        }
+        if (formState.password.isBlank()) {
+            showFieldError(ACTION_PASSWORD, getString(R.string.setup_error_empty_password))
+            hasError = true
+        }
+
+        if (hasError) return
 
         connect()
     }
@@ -123,7 +136,6 @@ class SetupXtreamFragment : GuidedStepSupportFragment() {
     private fun connect() {
         val sourceName = formState.resolvedName()
         setLoading(true)
-        showStatus(getString(R.string.setup_connecting))
 
         lifecycleScope.launch {
             runCatching {
@@ -147,23 +159,36 @@ class SetupXtreamFragment : GuidedStepSupportFragment() {
             }.onFailure { error ->
                 setLoading(false)
                 val message = error.message ?: getString(R.string.setup_error_auth)
-                showStatus(getString(R.string.setup_error_auth_detail, message))
+                showFieldError(ACTION_SAVE, message)
                 Toast.makeText(requireContext(), message, Toast.LENGTH_LONG).show()
             }
         }
     }
 
-    private fun validateForm(): String? {
-        if (formState.serverUrl.isBlank()) {
-            return getString(R.string.setup_error_empty_server)
+    private fun clearErrors() {
+        actionById(ACTION_SERVER)?.let {
+            it.description = formState.serverUrl
+            notifyActionChanged(actions.indexOf(it))
         }
-        if (formState.username.isBlank()) {
-            return getString(R.string.setup_error_empty_username)
+        actionById(ACTION_USERNAME)?.let {
+            it.description = formState.username
+            notifyActionChanged(actions.indexOf(it))
         }
-        if (formState.password.isBlank()) {
-            return getString(R.string.setup_error_empty_password)
+        actionById(ACTION_PASSWORD)?.let {
+            it.description = formState.password
+            notifyActionChanged(actions.indexOf(it))
         }
-        return null
+        actionById(ACTION_SAVE)?.let {
+            it.description = ""
+            notifyActionChanged(actions.indexOf(it))
+        }
+    }
+
+    private fun showFieldError(actionId: Long, message: String) {
+        actionById(actionId)?.let { action ->
+            action.description = message
+            notifyActionChanged(actions.indexOf(action))
+        }
     }
 
     private fun syncAllActionsToForm() {
@@ -207,15 +232,16 @@ class SetupXtreamFragment : GuidedStepSupportFragment() {
     }
 
     private fun setLoading(loading: Boolean) {
-        actionById(ACTION_SAVE)?.let { saveAction ->
-            saveAction.title = if (loading) getString(R.string.loading) else getString(R.string.setup_finish)
-            notifyActionChanged(actions.indexOf(saveAction))
+        actions.forEach { action ->
+            if (action.id == ACTION_SAVE) {
+                action.title = if (loading) getString(R.string.loading) else getString(R.string.setup_finish)
+                if (loading) {
+                    action.description = ""
+                }
+            }
+            action.isEnabled = !loading
+            notifyActionChanged(actions.indexOf(action))
         }
-    }
-
-    private fun showStatus(message: String) {
-        statusMessage = message
-        Toast.makeText(requireContext(), message, Toast.LENGTH_LONG).show()
     }
 
     private fun actionById(actionId: Long): GuidedAction? =

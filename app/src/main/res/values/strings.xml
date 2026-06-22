@@ -43,6 +43,7 @@
     <string name="watch_live">Watch Live</string>
     <string name="watch_movie">Watch Movie</string>
     <string name="watch_episode">Watch Episode</string>
+    <string name="watch_now">Watch Now</string>
     <string name="browse_episodes">Browse Episodes</string>
     <string name="search_hint">Search live TV, movies, and series</string>
     <string name="search_short_hint">Search</string>

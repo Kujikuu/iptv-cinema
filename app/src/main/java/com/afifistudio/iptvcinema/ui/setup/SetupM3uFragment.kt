@@ -89,9 +89,15 @@ class SetupM3uFragment : GuidedStepSupportFragment() {
     }
 
     private fun setLoading(loading: Boolean) {
-        actionById(ACTION_SAVE)?.let { saveAction ->
-            saveAction.title = if (loading) getString(R.string.loading) else getString(R.string.setup_finish)
-            notifyActionChanged(actions.indexOf(saveAction))
+        actions.forEach { action ->
+            if (action.id == ACTION_SAVE) {
+                action.title = if (loading) getString(R.string.loading) else getString(R.string.setup_finish)
+                if (loading) {
+                    action.description = ""
+                }
+            }
+            action.isEnabled = !loading
+            notifyActionChanged(actions.indexOf(action))
         }
     }
 

@@ -11,11 +11,11 @@
                 android:type="linear" />
         </shape>
     </item>
-    <!-- Horizontal gradient: darker on the left to make spotlight text pop -->
+    <!-- Horizontal gradient: darker on the right to make spotlight text pop in RTL -->
     <item>
         <shape android:shape="rectangle">
             <gradient
-                android:angle="0"
+                android:angle="180"
                 android:startColor="#CC050505"
                 android:endColor="#00050505"
                 android:type="linear" />

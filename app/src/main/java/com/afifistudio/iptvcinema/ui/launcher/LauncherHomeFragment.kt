@@ -418,6 +418,17 @@ class LauncherHomeFragment : Fragment() {
                     renderFavorites(state)
                     renderRecommendations(state)
                     updateBackdrop(state)
+
+                    if (!state.isLoading && !hasRequestedInitialFocus) {
+                        hasRequestedInitialFocus = true
+                        binding.launcherGrid.post {
+                            if (_binding != null) {
+                                binding.launcherGrid.selectedPosition = 0
+                                binding.launcherGrid.requestFocus()
+                                scrollToGrid(binding.launcherGrid)
+                            }
+                        }
+                    }
                 }
             }
         }
@@ -439,16 +450,14 @@ class LauncherHomeFragment : Fragment() {
         )
         val favHasFocus = gridBinding.favoritesGrid.hasFocus()
         val focusedPosition = gridBinding.favoritesGrid.selectedPosition
-        favoritesAdapter.clear()
-        items.forEach { item ->
-            favoritesAdapter.add(
-                item.toBrowseItem(favoriteIds = setOf(item.id), context = requireContext()).copy(
-                    usePosterLayout = false,
-                    cardWidthRes = R.dimen.launcher_cw_card_width,
-                    cardHeightRes = R.dimen.launcher_cw_card_height,
-                )
+        val list = items.map { item ->
+            item.toBrowseItem(favoriteIds = setOf(item.id), context = requireContext()).copy(
+                usePosterLayout = false,
+                cardWidthRes = R.dimen.launcher_cw_card_width,
+                cardHeightRes = R.dimen.launcher_cw_card_height,
             )
         }
+        updateAdapterInPlace(favoritesAdapter, list)
         if (favHasFocus && favoritesAdapter.size() > 0) {
             gridBinding.favoritesGrid.post {
                 val activeBinding = _binding ?: return@post
@@ -474,17 +483,15 @@ class LauncherHomeFragment : Fragment() {
         )
         val recHasFocus = gridBinding.recommendationsGrid.hasFocus()
         val focusedPosition = gridBinding.recommendationsGrid.selectedPosition
-        recommendationsAdapter.clear()
         val favoriteIds = state.favorites.map { it.id }.toSet()
-        items.forEach { item ->
-            recommendationsAdapter.add(
-                item.toBrowseItem(favoriteIds, context = requireContext()).copy(
-                    usePosterLayout = false,
-                    cardWidthRes = R.dimen.launcher_cw_card_width,
-                    cardHeightRes = R.dimen.launcher_cw_card_height,
-                )
+        val list = items.map { item ->
+            item.toBrowseItem(favoriteIds, context = requireContext()).copy(
+                usePosterLayout = false,
+                cardWidthRes = R.dimen.launcher_cw_card_width,
+                cardHeightRes = R.dimen.launcher_cw_card_height,
             )
         }
+        updateAdapterInPlace(recommendationsAdapter, list)
         if (recHasFocus && recommendationsAdapter.size() > 0) {
             gridBinding.recommendationsGrid.post {
                 val activeBinding = _binding ?: return@post
@@ -539,18 +546,11 @@ class LauncherHomeFragment : Fragment() {
             buildItem(state, BrowseSection.SERIES, ContentType.SERIES, lastUpdate),
         )
         val gridHasFocus = gridBinding.launcherGrid.hasFocus()
-        gridAdapter.clear()
-        items.forEach { gridAdapter.add(it) }
+        updateAdapterInPlace(gridAdapter, items)
         gridBinding.launcherGrid.post {
             val activeBinding = _binding ?: return@post
-            if (gridAdapter.size() > 0) {
-                activeBinding.launcherGrid.selectedPosition = 0
-                if (!hasRequestedInitialFocus) {
-                    hasRequestedInitialFocus = true
-                    activeBinding.launcherGrid.requestFocus()
-                } else if (gridHasFocus) {
-                    activeBinding.launcherGrid.requestFocus()
-                }
+            if (gridAdapter.size() > 0 && gridHasFocus) {
+                activeBinding.launcherGrid.requestFocus()
             }
         }
     }
@@ -575,18 +575,15 @@ class LauncherHomeFragment : Fragment() {
         val favoriteIds = state.favorites.map { it.id }.toSet()
         val cwHasFocus = gridBinding.continueWatchingGrid.hasFocus()
         val focusedPosition = gridBinding.continueWatchingGrid.selectedPosition
-        continueWatchingAdapter.clear()
-        items.forEach { item ->
-            continueWatchingAdapter.add(
-                item.toBrowseItem(requireContext(), favoriteIds).copy(
-                    usePosterLayout = false,
-                    cardWidthRes = R.dimen.launcher_cw_card_width,
-                    cardHeightRes = R.dimen.launcher_cw_card_height,
-                ),
+        val list = items.map { item ->
+            item.toBrowseItem(requireContext(), favoriteIds).copy(
+                usePosterLayout = false,
+                cardWidthRes = R.dimen.launcher_cw_card_width,
+                cardHeightRes = R.dimen.launcher_cw_card_height,
             )
-        }
+        }.toMutableList()
         if (state.continueWatching.size >= CONTINUE_WATCHING_ROW_LIMIT) {
-            continueWatchingAdapter.add(
+            list.add(
                 BrowseItem(
                     id = ContinueWatchingRowHelper.SEE_ALL_ITEM_ID,
                     title = getString(R.string.continue_watching_see_all),
@@ -594,6 +591,7 @@ class LauncherHomeFragment : Fragment() {
                 ),
             )
         }
+        updateAdapterInPlace(continueWatchingAdapter, list)
         if (cwHasFocus && continueWatchingAdapter.size() > 0) {
             gridBinding.continueWatchingGrid.post {
                 val activeBinding = _binding ?: return@post
@@ -680,6 +678,21 @@ class LauncherHomeFragment : Fragment() {
     private fun openSection(section: BrowseSection) {
         browseViewModel.selectSection(section)
         replaceContent(CategoryGridFragment.newInstance(fromLauncher = true))
+    }
+
+    private fun updateAdapterInPlace(adapter: ArrayObjectAdapter, newItems: List<Any>) {
+        if (adapter.size() == newItems.size) {
+            for (i in 0 until newItems.size) {
+                val oldItem = adapter.get(i)
+                val newItem = newItems[i]
+                if (oldItem != newItem) {
+                    adapter.replace(i, newItem)
+                }
+            }
+        } else {
+            adapter.clear()
+            newItems.forEach { adapter.add(it) }
+        }
     }
 
     override fun onDestroyView() {
