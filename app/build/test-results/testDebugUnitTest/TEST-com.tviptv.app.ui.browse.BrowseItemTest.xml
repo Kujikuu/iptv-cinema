@@ -1,7 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<testsuite name="com.tviptv.app.ui.browse.BrowseItemTest" tests="1" skipped="0" failures="0" errors="0" timestamp="2026-06-22T01:57:55" hostname="Apples-MacBook-Pro.local" time="0.001">
-  <properties/>
-  <testcase name="browseItem_storesChannelForNavigation" classname="com.tviptv.app.ui.browse.BrowseItemTest" time="0.001"/>
-  <system-out><![CDATA[]]></system-out>
-  <system-err><![CDATA[]]></system-err>
-</testsuite>
