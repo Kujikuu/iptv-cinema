@@ -1,22 +1,110 @@
 <?xml version="1.0" encoding="utf-8"?>
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:aapt="http://schemas.android.com/aapt"
     android:width="320dp"
     android:height="180dp"
     android:viewportWidth="320"
     android:viewportHeight="180">
+
+    <!-- Deep slate-to-black minimalist gradient background -->
     <path
-        android:fillColor="#0B0B0B"
-        android:pathData="M0,0h320v180h-320z" />
+        android:pathData="M0,0h320v180h-320z">
+        <aapt:attr name="android:fillColor">
+            <gradient
+                android:startX="160"
+                android:startY="0"
+                android:endX="160"
+                android:endY="180"
+                android:type="linear">
+                <item android:offset="0.0" android:color="#FF0F172A" />
+                <item android:offset="1.0" android:color="#FF020617" />
+            </gradient>
+        </aapt:attr>
+    </path>
+
+    <!-- Subtle horizontal glow behind the content -->
     <path
-        android:fillColor="#141414"
-        android:pathData="M40,40h240v100h-240z" />
+        android:pathData="M20,20h280v140h-280z">
+        <aapt:attr name="android:fillColor">
+            <gradient
+                android:centerX="160"
+                android:centerY="90"
+                android:gradientRadius="160"
+                android:type="radial">
+                <item android:offset="0.0" android:color="#12FFFFFF" />
+                <item android:offset="1.0" android:color="#00000000" />
+            </gradient>
+        </aapt:attr>
+    </path>
+
+    <!-- LEFT SIDE: Sleek Minimal Play Icon (App Icon Style) -->
+    <!-- Minimal squircle outline -->
     <path
-        android:fillColor="#E50914"
-        android:pathData="M130,65 L130,115 L190,90 Z" />
+        android:strokeWidth="1.2"
+        android:strokeColor="#22FFFFFF"
+        android:pathData="M55,50h60c4,4 0 0 1 4,4v60c0,4 -4,0 -4,4h-60c-4,0 -4,-4 -4,-4v-60c0,-4 4,-4 4,-4z" />
+
+    <!-- Soft radial glow centered behind the play icon -->
     <path
-        android:fillColor="#FFFFFF"
-        android:pathData="M210,75 L280,75 L280,85 L210,85 Z" />
+        android:pathData="M35,35h100v100h-100z">
+        <aapt:attr name="android:fillColor">
+            <gradient
+                android:centerX="85"
+                android:centerY="85"
+                android:gradientRadius="36"
+                android:type="radial">
+                <item android:offset="0.0" android:color="#33E50914" />
+                <item android:offset="1.0" android:color="#00000000" />
+            </gradient>
+        </aapt:attr>
+    </path>
+
+    <!-- Vibrant Play Icon Triangle -->
     <path
-        android:fillColor="#B3B3B3"
-        android:pathData="M210,95 L260,95 L260,105 L210,105 Z" />
+        android:pathData="M73,70 C73,67.3 75.9,65.6 78.3,67 L103.7,81.7 C106.1,83.1 106.1,86.6 103.7,88 L78.3,102.7 C75.9,104.1 73,102.4 73,99.6 Z">
+        <aapt:attr name="android:fillColor">
+            <gradient
+                android:startX="73"
+                android:startY="85"
+                android:endX="104"
+                android:endY="85"
+                android:type="linear">
+                <item android:offset="0.0" android:color="#FFFF3E5E" />
+                <item android:offset="1.0" android:color="#FFE50914" />
+            </gradient>
+        </aapt:attr>
+    </path>
+
+    <!-- RIGHT SIDE: Minimal & Sharp Typography -->
+    <!-- Bold white-to-gray gradient IPTV Title -->
+    <path
+        android:pathData="
+            M150,65 h6 v30 h-6 z
+            M166,65 h14 c3.8,0 7,3.2 7,7 v4 c0,3.8 -3.2,7 -7,7 h-8 v12 h-6 z M172,72 h8 c1.1,0 2,0.9 2,2 v0 c0,1.1 -0.9,2 -2,2 h-8 z
+            M196,65 h22 v6 h-8 v24 h-6 v-24 h-8 z
+            M225,65 h6 L239,83 L247,65 h6 L242,95 h-6 z">
+        <aapt:attr name="android:fillColor">
+            <gradient
+                android:startX="150"
+                android:startY="80"
+                android:endX="253"
+                android:endY="80"
+                android:type="linear">
+                <item android:offset="0.0" android:color="#FFFFFFFF" />
+                <item android:offset="1.0" android:color="#FFE2E8F0" />
+            </gradient>
+        </aapt:attr>
+    </path>
+
+    <!-- Crimson Red CINEMA Subtitle -->
+    <path
+        android:fillColor="#FFE50914"
+        android:pathData="
+            M172,104 h5 v1.5 h-3.5 v5 h3.5 v1.5 h-5 z
+            M184,104 h1.5 v8 h-1.5 z
+            M191,104 h1.5 l2.5,5.5 v-5.5 h1.5 v8 h-1.5 l-2.5,-5.5 v5.5 h-1.5 z
+            M202,104 h5 v1.5 h-3.5 v2 h3 v1.5 h-3 v1.5 h3.5 v1.5 h-5 z
+            M213,104 h1.5 l2,3 l2,-3 h1.5 v8 h-1.5 v-4.5 l-2,3 l-2,-3 v4.5 h-1.5 z
+            M224,104 h5 v8 h-1.5 v-3 h-2 v3 h-1.5 z M225.5,105.5 v2.5 h2 v-2.5 z" />
+
 </vector>

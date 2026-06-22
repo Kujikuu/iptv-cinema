@@ -41,6 +41,11 @@ import com.afifistudio.iptvcinema.ui.browse.toBrowseItem
 import com.afifistudio.iptvcinema.ui.categories.CategoryGridFragment
 import com.afifistudio.iptvcinema.ui.common.SectionIcons
 import com.afifistudio.iptvcinema.ui.replaceContent
+import com.afifistudio.iptvcinema.ui.details.SeriesDetailsFragment
+import com.afifistudio.iptvcinema.ui.details.ChannelDetailsFragment
+import com.afifistudio.iptvcinema.ui.player.PlayerActivity
+import com.afifistudio.iptvcinema.domain.model.Channel
+import androidx.leanback.widget.HorizontalGridView
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -55,34 +60,36 @@ class LauncherHomeFragment : Fragment() {
     private val binding get() = _binding!!
     private lateinit var gridAdapter: ArrayObjectAdapter
     private lateinit var continueWatchingAdapter: ArrayObjectAdapter
+    private lateinit var favoritesAdapter: ArrayObjectAdapter
+    private lateinit var recommendationsAdapter: ArrayObjectAdapter
     private var continueWatchingItems: List<ContinueWatchingItem> = emptyList()
-    private var lastContentFocusTarget = ContentFocusTarget.SectionGrid
+    private var lastFocusedGridId: Int = R.id.launcher_grid
     private var hasRequestedInitialFocus = false
-
-    private enum class ContentFocusTarget {
-        SectionGrid,
-        ContinueWatching,
-    }
 
     private val contentFocusHandler = object : ContentFocusHandler {
         override fun requestInitialFocus(): Boolean {
-            return when (lastContentFocusTarget) {
-                ContentFocusTarget.ContinueWatching -> {
-                    if (binding.continueWatchingSection.isVisible && continueWatchingAdapter.size() > 0) {
-                        focusContinueWatchingRow()
-                        true
-                    } else {
-                        focusSectionGrid()
-                    }
-                }
-                ContentFocusTarget.SectionGrid -> focusSectionGrid()
+            val grid = binding.root.findViewById<HorizontalGridView>(lastFocusedGridId)
+            if (grid != null && grid.isVisible && grid.isFocusable && grid.adapter != null && grid.adapter!!.itemCount > 0) {
+                grid.requestFocus()
+                scrollToGrid(grid)
+                return true
             }
+            binding.launcherGrid.post {
+                if (_binding != null) {
+                    binding.launcherGrid.selectedPosition = 0
+                    binding.launcherGrid.requestFocus()
+                    scrollToGrid(binding.launcherGrid)
+                }
+            }
+            return true
         }
 
-        override fun canFocusUpToChrome(): Boolean = true
+        override fun canFocusUpToChrome(): Boolean {
+            return lastFocusedGridId == R.id.launcher_grid
+        }
 
         override fun onChromeFocusGained() {
-            scrollToSectionRow()
+            scrollToGrid(binding.launcherGrid)
         }
     }
 
@@ -100,6 +107,8 @@ class LauncherHomeFragment : Fragment() {
         hasRequestedInitialFocus = false
         setupGrid()
         setupContinueWatchingGrid()
+        setupFavoritesGrid()
+        setupRecommendationsGrid()
         wireVerticalFocusNavigation()
         showPlaceholderSections()
         observeState()
@@ -183,56 +192,89 @@ class LauncherHomeFragment : Fragment() {
         binding.continueWatchingGrid.setPadding(horizontalPadding, 0, horizontalPadding, 0)
     }
 
+    private fun setupFavoritesGrid() {
+        val contentCardPresenter = ContentCardPresenter(
+            onClick = { item -> handleContentClick(item) },
+        )
+        favoritesAdapter = ArrayObjectAdapter(contentCardPresenter)
+        val bridgeAdapter = ItemBridgeAdapter(favoritesAdapter)
+        FocusHighlightHelper.setupBrowseItemFocusHighlight(
+            bridgeAdapter,
+            FocusHighlight.ZOOM_FACTOR_NONE,
+            false,
+        )
+        binding.favoritesGrid.adapter = bridgeAdapter
+        binding.favoritesGrid.clipChildren = false
+        binding.favoritesGrid.clipToPadding = false
+        binding.favoritesGrid.horizontalSpacing =
+            resources.getDimensionPixelSize(R.dimen.row_item_spacing)
+        val cardHeight = resources.getDimensionPixelSize(R.dimen.launcher_cw_card_height)
+        val focusInset = resources.getDimensionPixelSize(R.dimen.launcher_cw_focus_inset)
+        binding.favoritesGrid.setRowHeight(cardHeight + focusInset)
+        binding.favoritesGrid.isScrollEnabled = true
+        val horizontalPadding =
+            resources.getDimensionPixelSize(R.dimen.launcher_content_horizontal_padding)
+        binding.favoritesGrid.setPadding(horizontalPadding, 0, horizontalPadding, 0)
+    }
+
+    private fun setupRecommendationsGrid() {
+        val contentCardPresenter = ContentCardPresenter(
+            onClick = { item -> handleContentClick(item) },
+        )
+        recommendationsAdapter = ArrayObjectAdapter(contentCardPresenter)
+        val bridgeAdapter = ItemBridgeAdapter(recommendationsAdapter)
+        FocusHighlightHelper.setupBrowseItemFocusHighlight(
+            bridgeAdapter,
+            FocusHighlight.ZOOM_FACTOR_NONE,
+            false,
+        )
+        binding.recommendationsGrid.adapter = bridgeAdapter
+        binding.recommendationsGrid.clipChildren = false
+        binding.recommendationsGrid.clipToPadding = false
+        binding.recommendationsGrid.horizontalSpacing =
+            resources.getDimensionPixelSize(R.dimen.row_item_spacing)
+        val cardHeight = resources.getDimensionPixelSize(R.dimen.launcher_cw_card_height)
+        val focusInset = resources.getDimensionPixelSize(R.dimen.launcher_cw_focus_inset)
+        binding.recommendationsGrid.setRowHeight(cardHeight + focusInset)
+        binding.recommendationsGrid.isScrollEnabled = true
+        val horizontalPadding =
+            resources.getDimensionPixelSize(R.dimen.launcher_content_horizontal_padding)
+        binding.recommendationsGrid.setPadding(horizontalPadding, 0, horizontalPadding, 0)
+    }
+
     private fun wireVerticalFocusNavigation() {
         binding.launcherGrid.setOnKeyInterceptListener { event ->
             if (event.action != KeyEvent.ACTION_DOWN) return@setOnKeyInterceptListener false
-            when (event.keyCode) {
-                KeyEvent.KEYCODE_DPAD_UP -> {
-                    lastContentFocusTarget = ContentFocusTarget.SectionGrid
-                    requestChromeFocus()
-                }
-                KeyEvent.KEYCODE_DPAD_DOWN -> {
-                    if (binding.continueWatchingSection.isVisible && continueWatchingAdapter.size() > 0) {
-                        lastContentFocusTarget = ContentFocusTarget.ContinueWatching
-                        focusContinueWatchingRow()
-                        true
-                    } else {
-                        false
-                    }
-                }
-                else -> false
-            }
+            handleGridKeyDown(binding.launcherGrid, event.keyCode)
         }
         binding.launcherGrid.setOnFocusChangeListener { _, hasFocus ->
-            if (hasFocus) lastContentFocusTarget = ContentFocusTarget.SectionGrid
+            if (hasFocus) lastFocusedGridId = R.id.launcher_grid
         }
+
         binding.continueWatchingGrid.setOnKeyInterceptListener { event ->
             if (event.action != KeyEvent.ACTION_DOWN) return@setOnKeyInterceptListener false
-            when (event.keyCode) {
-                KeyEvent.KEYCODE_DPAD_UP -> {
-                    lastContentFocusTarget = ContentFocusTarget.SectionGrid
-                    binding.launcherGrid.requestFocus()
-                    scrollToSectionRow()
-                    true
-                }
-                else -> false
-            }
+            handleGridKeyDown(binding.continueWatchingGrid, event.keyCode)
         }
         binding.continueWatchingGrid.setOnFocusChangeListener { _, hasFocus ->
-            if (hasFocus) lastContentFocusTarget = ContentFocusTarget.ContinueWatching
+            if (hasFocus) lastFocusedGridId = R.id.continue_watching_grid
         }
-        binding.continueWatchingGrid.setOnChildViewHolderSelectedListener(
-            object : OnChildViewHolderSelectedListener() {
-                override fun onChildViewHolderSelected(
-                    parent: RecyclerView,
-                    child: RecyclerView.ViewHolder?,
-                    position: Int,
-                    subposition: Int,
-                ) {
-                    scrollToContinueWatching()
-                }
-            },
-        )
+
+        binding.favoritesGrid.setOnKeyInterceptListener { event ->
+            if (event.action != KeyEvent.ACTION_DOWN) return@setOnKeyInterceptListener false
+            handleGridKeyDown(binding.favoritesGrid, event.keyCode)
+        }
+        binding.favoritesGrid.setOnFocusChangeListener { _, hasFocus ->
+            if (hasFocus) lastFocusedGridId = R.id.favorites_grid
+        }
+
+        binding.recommendationsGrid.setOnKeyInterceptListener { event ->
+            if (event.action != KeyEvent.ACTION_DOWN) return@setOnKeyInterceptListener false
+            handleGridKeyDown(binding.recommendationsGrid, event.keyCode)
+        }
+        binding.recommendationsGrid.setOnFocusChangeListener { _, hasFocus ->
+            if (hasFocus) lastFocusedGridId = R.id.recommendations_grid
+        }
+
         binding.launcherGrid.setOnChildViewHolderSelectedListener(
             object : OnChildViewHolderSelectedListener() {
                 override fun onChildViewHolderSelected(
@@ -242,43 +284,114 @@ class LauncherHomeFragment : Fragment() {
                     subposition: Int,
                 ) {
                     if (child != null) {
-                        scrollToSectionRow()
+                        scrollToGrid(binding.launcherGrid)
+                    }
+                }
+            },
+        )
+        binding.continueWatchingGrid.setOnChildViewHolderSelectedListener(
+            object : OnChildViewHolderSelectedListener() {
+                override fun onChildViewHolderSelected(
+                    parent: RecyclerView,
+                    child: RecyclerView.ViewHolder?,
+                    position: Int,
+                    subposition: Int,
+                ) {
+                    if (child != null) {
+                        scrollToGrid(binding.continueWatchingGrid)
+                    }
+                }
+            },
+        )
+        binding.favoritesGrid.setOnChildViewHolderSelectedListener(
+            object : OnChildViewHolderSelectedListener() {
+                override fun onChildViewHolderSelected(
+                    parent: RecyclerView,
+                    child: RecyclerView.ViewHolder?,
+                    position: Int,
+                    subposition: Int,
+                ) {
+                    if (child != null) {
+                        scrollToGrid(binding.favoritesGrid)
+                    }
+                }
+            },
+        )
+        binding.recommendationsGrid.setOnChildViewHolderSelectedListener(
+            object : OnChildViewHolderSelectedListener() {
+                override fun onChildViewHolderSelected(
+                    parent: RecyclerView,
+                    child: RecyclerView.ViewHolder?,
+                    position: Int,
+                    subposition: Int,
+                ) {
+                    if (child != null) {
+                        scrollToGrid(binding.recommendationsGrid)
                     }
                 }
             },
         )
     }
 
-    private fun focusContinueWatchingRow() {
-        binding.continueWatchingGrid.post {
-            if (_binding == null || continueWatchingAdapter.size() == 0) return@post
-            binding.continueWatchingGrid.selectedPosition = 0
-            binding.continueWatchingGrid.requestFocus()
-            scrollToContinueWatching()
+    private fun getVisibleGrids(): List<HorizontalGridView> = buildList {
+        add(binding.launcherGrid)
+        if (binding.continueWatchingSection.isVisible && continueWatchingAdapter.size() > 0) {
+            add(binding.continueWatchingGrid)
+        }
+        if (binding.favoritesSection.isVisible && favoritesAdapter.size() > 0) {
+            add(binding.favoritesGrid)
+        }
+        if (binding.recommendationsSection.isVisible && recommendationsAdapter.size() > 0) {
+            add(binding.recommendationsGrid)
         }
     }
 
-    private fun focusSectionGrid(): Boolean {
-        binding.launcherGrid.post {
-            if (_binding == null || gridAdapter.size() == 0) return@post
-            binding.launcherGrid.selectedPosition = 0
-            binding.launcherGrid.requestFocus()
-            scrollToSectionRow()
+    private fun handleGridKeyDown(grid: HorizontalGridView, keyCode: Int): Boolean {
+        val visibleGrids = getVisibleGrids()
+        val index = visibleGrids.indexOf(grid)
+        if (index == -1) return false
+
+        return when (keyCode) {
+            KeyEvent.KEYCODE_DPAD_UP -> {
+                if (index == 0) {
+                    lastFocusedGridId = grid.id
+                    requestChromeFocus()
+                    true
+                } else {
+                    val prevGrid = visibleGrids[index - 1]
+                    lastFocusedGridId = prevGrid.id
+                    prevGrid.requestFocus()
+                    scrollToGrid(prevGrid)
+                    true
+                }
+            }
+            KeyEvent.KEYCODE_DPAD_DOWN -> {
+                if (index < visibleGrids.lastIndex) {
+                    val nextGrid = visibleGrids[index + 1]
+                    lastFocusedGridId = nextGrid.id
+                    nextGrid.requestFocus()
+                    scrollToGrid(nextGrid)
+                    true
+                } else {
+                    false
+                }
+            }
+            else -> false
         }
-        return true
     }
 
-    private fun scrollToContinueWatching() {
+    private fun scrollToGrid(grid: HorizontalGridView) {
         val scrollView = binding.root as? NestedScrollView ?: return
         scrollView.post {
-            scrollView.smoothScrollTo(0, binding.continueWatchingSection.top)
-        }
-    }
-
-    private fun scrollToSectionRow() {
-        val scrollView = binding.root as? NestedScrollView ?: return
-        scrollView.post {
-            scrollView.smoothScrollTo(0, 0)
+            if (_binding == null) return@post
+            val targetY = when (grid.id) {
+                R.id.launcher_grid -> 0
+                R.id.continue_watching_grid -> binding.continueWatchingSection.top
+                R.id.favorites_grid -> binding.favoritesSection.top
+                R.id.recommendations_grid -> binding.recommendationsSection.top
+                else -> 0
+            }
+            scrollView.smoothScrollTo(0, targetY)
         }
     }
 
@@ -302,9 +415,93 @@ class LauncherHomeFragment : Fragment() {
                     if (_binding == null) return@collect
                     renderSections(state)
                     renderContinueWatching(state)
+                    renderFavorites(state)
+                    renderRecommendations(state)
                     updateBackdrop(state)
                 }
             }
+        }
+    }
+
+    private fun renderFavorites(state: BrowseUiState) {
+        val gridBinding = _binding ?: return
+        val items = state.favorites
+        if (items.isEmpty()) {
+            gridBinding.favoritesSection.isVisible = false
+            favoritesAdapter.clear()
+            return
+        }
+        gridBinding.favoritesSection.isVisible = true
+        gridBinding.favoritesHeader.text = getString(
+            R.string.row_header_count,
+            getString(R.string.favorites_row),
+            items.size,
+        )
+        val favHasFocus = gridBinding.favoritesGrid.hasFocus()
+        val focusedPosition = gridBinding.favoritesGrid.selectedPosition
+        favoritesAdapter.clear()
+        items.forEach { item ->
+            favoritesAdapter.add(
+                item.toBrowseItem(favoriteIds = setOf(item.id), context = requireContext()).copy(
+                    usePosterLayout = false,
+                    cardWidthRes = R.dimen.launcher_cw_card_width,
+                    cardHeightRes = R.dimen.launcher_cw_card_height,
+                )
+            )
+        }
+        if (favHasFocus && favoritesAdapter.size() > 0) {
+            gridBinding.favoritesGrid.post {
+                val activeBinding = _binding ?: return@post
+                activeBinding.favoritesGrid.selectedPosition = focusedPosition.coerceAtMost(favoritesAdapter.size() - 1)
+                activeBinding.favoritesGrid.requestFocus()
+            }
+        }
+    }
+
+    private fun renderRecommendations(state: BrowseUiState) {
+        val gridBinding = _binding ?: return
+        val items = state.recommendedChannels
+        if (items.isEmpty()) {
+            gridBinding.recommendationsSection.isVisible = false
+            recommendationsAdapter.clear()
+            return
+        }
+        gridBinding.recommendationsSection.isVisible = true
+        gridBinding.recommendationsHeader.text = getString(
+            R.string.row_header_count,
+            state.recommendedRowTitle,
+            items.size,
+        )
+        val recHasFocus = gridBinding.recommendationsGrid.hasFocus()
+        val focusedPosition = gridBinding.recommendationsGrid.selectedPosition
+        recommendationsAdapter.clear()
+        val favoriteIds = state.favorites.map { it.id }.toSet()
+        items.forEach { item ->
+            recommendationsAdapter.add(
+                item.toBrowseItem(favoriteIds, context = requireContext()).copy(
+                    usePosterLayout = false,
+                    cardWidthRes = R.dimen.launcher_cw_card_width,
+                    cardHeightRes = R.dimen.launcher_cw_card_height,
+                )
+            )
+        }
+        if (recHasFocus && recommendationsAdapter.size() > 0) {
+            gridBinding.recommendationsGrid.post {
+                val activeBinding = _binding ?: return@post
+                activeBinding.recommendationsGrid.selectedPosition = focusedPosition.coerceAtMost(recommendationsAdapter.size() - 1)
+                activeBinding.recommendationsGrid.requestFocus()
+            }
+        }
+    }
+
+    private fun handleContentClick(item: BrowseItem) {
+        val channel = item.channel ?: return
+        when (channel.contentType) {
+            ContentType.LIVE, ContentType.MOVIE -> {
+                startActivity(PlayerActivity.createIntent(requireContext(), channel, channel.categoryId))
+            }
+            ContentType.SERIES -> replaceContent(SeriesDetailsFragment.newInstance(channel))
+            ContentType.EPISODE -> replaceContent(ChannelDetailsFragment.newInstance(channel))
         }
     }
 

@@ -49,6 +49,8 @@ data class BrowseUiState(
     val featuredChannel: Channel? = null,
     val continueWatching: List<ContinueWatchingItem> = emptyList(),
     val favorites: List<Channel> = emptyList(),
+    val recommendedChannels: List<Channel> = emptyList(),
+    val recommendedRowTitle: String = "",
     val categoryRows: List<CategoryRow> = emptyList(),
     val categorySummaries: List<CategorySummary> = emptyList(),
     val homeCategoryHighlights: List<CategorySummary> = emptyList(),
@@ -475,6 +477,8 @@ class BrowseViewModel @Inject constructor(
                     selectedSection = section,
                     favorites = cached.favorites,
                     continueWatching = cached.continueWatching,
+                    recommendedChannels = cached.recommendedChannels,
+                    recommendedRowTitle = cached.recommendedRowTitle,
                     categoryRows = emptyList(),
                     categorySummaries = emptyList(),
                     homeCategoryHighlights = cached.homeCategoryHighlights,
@@ -494,6 +498,33 @@ class BrowseViewModel @Inject constructor(
         val continueWatching = loadContinueWatching(sourceId, categoryNameMap)
         val homeCategoryHighlights = loadHomeCategoryHighlights(sourceId, repository)
 
+        val recentItem = continueWatching.firstOrNull()?.channel ?: favorites.firstOrNull()
+        var recommended: List<Channel> = emptyList()
+        var rowTitle = "Recommended For You"
+        if (recentItem != null && !recentItem.categoryId.isNullOrBlank()) {
+            val categoryName = recentItem.categoryName ?: categoryNameMap[recentItem.categoryId] ?: ""
+            rowTitle = if (categoryName.isNotBlank()) "Because you watched $categoryName" else "Recommended For You"
+            recommended = channelDao.getByCategory(
+                sourceId = sourceId,
+                categoryId = recentItem.categoryId,
+                contentType = recentItem.contentType,
+                limit = 15
+            ).map { it.toDomain(categoryName) }
+             .filterNot { it.id == recentItem.id }
+        }
+        if (recommended.isEmpty()) {
+            val highlight = homeCategoryHighlights.firstOrNull()
+            if (highlight != null) {
+                rowTitle = "Featured in ${highlight.category.name}"
+                recommended = channelDao.getByCategory(
+                    sourceId = sourceId,
+                    categoryId = highlight.category.id,
+                    contentType = highlight.category.contentType,
+                    limit = 15
+                ).map { it.toDomain(highlight.category.name) }
+            }
+        }
+
         val featuredChannel = continueWatching.firstOrNull()?.channel
             ?: favorites.firstOrNull()
             ?: featuredFromHighlights(sourceId, homeCategoryHighlights)
@@ -508,6 +539,8 @@ class BrowseViewModel @Inject constructor(
                 continueWatching = continueWatching,
                 homeCategoryHighlights = homeCategoryHighlights,
                 featuredChannel = featuredChannel,
+                recommendedChannels = recommended,
+                recommendedRowTitle = rowTitle,
             ),
         )
 
@@ -518,6 +551,8 @@ class BrowseViewModel @Inject constructor(
                 selectedSection = section,
                 favorites = favorites,
                 continueWatching = continueWatching,
+                recommendedChannels = recommended,
+                recommendedRowTitle = rowTitle,
                 categoryRows = emptyList(),
                 categorySummaries = emptyList(),
                 homeCategoryHighlights = homeCategoryHighlights,

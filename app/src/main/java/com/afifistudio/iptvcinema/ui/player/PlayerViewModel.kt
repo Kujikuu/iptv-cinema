@@ -85,6 +85,9 @@ class PlayerViewModel @Inject constructor(
     private val _nextEpisodeUiState = MutableStateFlow(NextEpisodeUiState())
     val nextEpisodeUiState: StateFlow<NextEpisodeUiState> = _nextEpisodeUiState.asStateFlow()
 
+    private val _episodes = MutableStateFlow<List<Episode>>(emptyList())
+    val episodes: StateFlow<List<Episode>> = _episodes.asStateFlow()
+
     private var positionSaveJob: Job? = null
     private var epgRefreshJob: Job? = null
     private var parentSeries: Channel? = null
@@ -189,12 +192,14 @@ class PlayerViewModel @Inject constructor(
         autoplayTriggered = false
         if (channel.contentType != ContentType.EPISODE) {
             parentSeries = null
+            _episodes.value = emptyList()
             _nextEpisodeUiState.value = NextEpisodeUiState()
             return
         }
         val seriesId = channel.seriesId?.takeIf { it.isNotBlank() }
         if (seriesId == null) {
             parentSeries = null
+            _episodes.value = emptyList()
             _nextEpisodeUiState.value = NextEpisodeUiState()
             return
         }
@@ -205,6 +210,7 @@ class PlayerViewModel @Inject constructor(
         )
         if (seriesEntity == null) {
             parentSeries = null
+            _episodes.value = emptyList()
             _nextEpisodeUiState.value = NextEpisodeUiState()
             return
         }
@@ -212,23 +218,32 @@ class PlayerViewModel @Inject constructor(
         parentSeries = series
         val source = sourceDao.getById(channel.sourceId)
         if (source == null) {
+            _episodes.value = emptyList()
             _nextEpisodeUiState.value = NextEpisodeUiState()
             return
         }
         runCatching {
             seriesEpisodesLoader.loadEpisodes(series, source.updatedAt)
         }.onSuccess { episodes ->
+            _episodes.value = episodes
             _nextEpisodeUiState.value = NextEpisodeUiState(
                 nextEpisode = findNextEpisode(episodes, channel.id),
             )
         }.onFailure {
+            _episodes.value = emptyList()
             _nextEpisodeUiState.value = NextEpisodeUiState()
         }
     }
 
     private fun resetAutoplayState() {
         _nextEpisodeUiState.value = NextEpisodeUiState()
+        _episodes.value = emptyList()
         parentSeries = null
+    }
+
+    fun getEpisodeChannel(episode: Episode): Channel? {
+        val series = parentSeries ?: return null
+        return episode.toChannel(series)
     }
 
     fun setOverlayMode(mode: PlayerOverlayMode) {

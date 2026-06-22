@@ -31,7 +31,8 @@ class PlayerRemoteController {
         if (overlayMode == PlayerOverlayMode.ChannelList ||
             overlayMode == PlayerOverlayMode.TrackPicker ||
             overlayMode == PlayerOverlayMode.Settings ||
-            overlayMode == PlayerOverlayMode.Info
+            overlayMode == PlayerOverlayMode.Info ||
+            overlayMode == PlayerOverlayMode.Episodes
         ) {
             return PlayerKeyAction.PassThrough
         }
@@ -98,7 +99,8 @@ class PlayerRemoteController {
         overlayMode == PlayerOverlayMode.ChannelList ||
             overlayMode == PlayerOverlayMode.TrackPicker ||
             overlayMode == PlayerOverlayMode.Settings ||
-            overlayMode == PlayerOverlayMode.Info ->
+            overlayMode == PlayerOverlayMode.Info ||
+            overlayMode == PlayerOverlayMode.Episodes ->
             BackAction.ClosePanel
         else -> BackAction.Exit
     }

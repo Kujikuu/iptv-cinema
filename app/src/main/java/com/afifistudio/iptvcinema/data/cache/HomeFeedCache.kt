@@ -11,6 +11,8 @@ data class CachedHomeFeed(
     val continueWatching: List<ContinueWatchingItem>,
     val homeCategoryHighlights: List<CategorySummary>,
     val featuredChannel: Channel?,
+    val recommendedChannels: List<Channel> = emptyList(),
+    val recommendedRowTitle: String = "",
 )
 
 @Singleton

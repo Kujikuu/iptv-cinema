@@ -26,6 +26,7 @@ import com.afifistudio.iptvcinema.data.prefs.AppPreferences
 import com.afifistudio.iptvcinema.databinding.ActivityPlayerBinding
 import com.afifistudio.iptvcinema.domain.model.Channel
 import com.afifistudio.iptvcinema.domain.model.ContentType
+import com.afifistudio.iptvcinema.domain.model.Episode
 import com.afifistudio.iptvcinema.domain.repository.IptvRepositoryFactory
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
@@ -68,6 +69,7 @@ class PlayerActivity : AppCompatActivity() {
         Subtitles,
         Audio,
         Settings,
+        Episodes,
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -207,6 +209,7 @@ class PlayerActivity : AppCompatActivity() {
         binding.playerSubtitles.setOnClickListener { showSubtitlePanel() }
         binding.playerAudio.setOnClickListener { showAudioPanel() }
         binding.playerSettings.setOnClickListener { showSettingsPanel() }
+        binding.playerEpisodes.setOnClickListener { showEpisodesPanel() }
     }
 
     private fun observeViewModel() {
@@ -335,6 +338,7 @@ class PlayerActivity : AppCompatActivity() {
         val isVod = !isLive
         binding.playerSeekContainer.isVisible = isVod
         binding.playerEpgRow.isVisible = isLive
+        binding.playerEpisodes.isVisible = activeChannel.contentType == ContentType.EPISODE
         seekController.setVisible(isVod)
         updateTransportButtons(isLive)
 
@@ -679,12 +683,40 @@ class PlayerActivity : AppCompatActivity() {
         playerViewModel.setOverlayMode(PlayerOverlayMode.Settings)
     }
 
+    private fun showEpisodesPanel() {
+        val list = playerViewModel.episodes.value
+        if (list.isEmpty()) {
+            showPlayerToast("No episodes available")
+            return
+        }
+        val options = list.map { episode ->
+            val label = "S${episode.seasonNumber} E${episode.episodeNumber} · ${episode.title}"
+            PlayerListOption(
+                label = label,
+                id = "episode:${episode.id}",
+                selected = episode.id == channel.id
+            )
+        }
+        activeListPanelType = ListPanelType.Episodes
+        overlayController.cancelHideTimer()
+        listPanel.show(getString(R.string.player_episodes), options)
+        playerViewModel.setOverlayMode(PlayerOverlayMode.Episodes)
+    }
+
+    private fun applyEpisodesOption(option: PlayerListOption) {
+        val episodeId = option.id.removePrefix("episode:")
+        val episode = playerViewModel.episodes.value.find { it.id == episodeId } ?: return
+        val nextChannel = playerViewModel.getEpisodeChannel(episode) ?: return
+        switchToChannel(nextChannel, showToast = false)
+    }
+
     private fun handleListOption(option: PlayerListOption) {
         val exoPlayer = player ?: return
         when (activeListPanelType) {
             ListPanelType.Subtitles -> applySubtitleOption(exoPlayer, option)
             ListPanelType.Audio -> applyAudioOption(exoPlayer, option)
             ListPanelType.Settings -> applySettingsOption(option)
+            ListPanelType.Episodes -> applyEpisodesOption(option)
             null -> Unit
         }
         closeListPanel()

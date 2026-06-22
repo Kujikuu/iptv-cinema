@@ -7,4 +7,5 @@ enum class PlayerOverlayMode {
     TrackPicker,
     Settings,
     Info,
+    Episodes,
 }

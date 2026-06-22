@@ -58,6 +58,11 @@ class ContentCardPresenter(
         binding.cardSubtitle.text = subtitleText
         binding.cardSubtitle.isVisible = subtitleText.isNotBlank()
 
+        val density = context.resources.displayMetrics.density
+        val hasFocusNow = root.hasFocus()
+        binding.cardSubtitle.alpha = if (hasFocusNow) 1f else 0f
+        binding.cardSubtitle.translationY = if (hasFocusNow) 0f else 8f * density
+
         bindWatchProgress(binding, card)
 
         if (card.badge.isNullOrBlank()) {
@@ -71,6 +76,7 @@ class ContentCardPresenter(
                 R.drawable.badge_chip_bg
             }
             binding.cardBadge.setBackgroundResource(badgeBg)
+            binding.cardBadge.alpha = if (hasFocusNow) 1f else 0.5f
         }
 
         binding.cardFavorite.isVisible = card.isFavorite
@@ -82,6 +88,21 @@ class ContentCardPresenter(
 
         root.setOnFocusChangeListener { _, hasFocus ->
             CardFocusHelper.applyContentCardFocus(binding.cardContainer, hasFocus, focusScale)
+            if (subtitleText.isNotBlank()) {
+                val targetAlpha = if (hasFocus) 1f else 0f
+                val targetTranslation = if (hasFocus) 0f else 8f * density
+                binding.cardSubtitle.animate()
+                    .alpha(targetAlpha)
+                    .translationY(targetTranslation)
+                    .setDuration(150)
+                    .start()
+            }
+            if (!card.badge.isNullOrBlank()) {
+                binding.cardBadge.animate()
+                    .alpha(if (hasFocus) 1f else 0.5f)
+                    .setDuration(150)
+                    .start()
+            }
         }
 
         root.setOnLongClickListener {

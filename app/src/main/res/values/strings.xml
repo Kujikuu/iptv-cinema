@@ -119,6 +119,7 @@
     <string name="launcher_count_series">+%1$d Series</string>
     <string name="library_empty">Nothing here yet</string>
     <string name="player_subtitles">Subtitles</string>
+    <string name="player_episodes">Episodes</string>
     <string name="player_settings">Settings</string>
     <string name="player_no_subtitles">No subtitles available</string>
     <string name="player_playback_speed">Playback speed</string>

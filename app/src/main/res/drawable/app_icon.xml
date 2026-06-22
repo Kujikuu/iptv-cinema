@@ -1,49 +1,74 @@
 <?xml version="1.0" encoding="utf-8"?>
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:aapt="http://schemas.android.com/aapt"
     android:width="108dp"
     android:height="108dp"
     android:viewportWidth="108"
     android:viewportHeight="108">
 
-    <!-- Background -->
+    <!-- Deep slate-to-black minimalist gradient background -->
     <path
-        android:fillColor="#111827"
-        android:pathData="M12,12
-                          h84
-                          a12,12 0 0 1 12,12
-                          v60
-                          a12,12 0 0 1 -12,12
-                          h-84
-                          a12,12 0 0 1 -12,-12
-                          v-60
-                          a12,12 0 0 1 12,-12z"/>
+        android:pathData="M16,8h76a8,8 0 0 1 8,8v76a8,8 0 0 1 -8,8h-76a8,8 0 0 1 -8,-8v-76a8,8 0 0 1 8,-8z">
+        <aapt:attr name="android:fillColor">
+            <gradient
+                android:startX="54"
+                android:startY="0"
+                android:endX="54"
+                android:endY="108"
+                android:type="linear">
+                <item android:offset="0.0" android:color="#FF0F172A" />
+                <item android:offset="1.0" android:color="#FF020617" />
+            </gradient>
+        </aapt:attr>
+    </path>
 
-    <!-- TV Stand -->
+    <!-- Ultra-thin, subtle outer squircle border for premium definition -->
     <path
-        android:fillColor="#374151"
-        android:pathData="M44,84 h20 v6 h-20z"/>
+        android:strokeWidth="1"
+        android:strokeColor="#1F2937"
+        android:pathData="M16,8h76a8,8 0 0 1 8,8v76a8,8 0 0 1 -8,8h-76a8,8 0 0 1 -8,-8v-76a8,8 0 0 1 8,-8z" />
 
-    <!-- TV Frame -->
+    <!-- Minimal, glowing circular/squircle outline around the play button -->
     <path
-        android:fillColor="#1F2937"
-        android:pathData="M22,24
-                          h64
-                          a6,6 0 0 1 6,6
-                          v36
-                          a6,6 0 0 1 -6,6
-                          h-64
-                          a6,6 0 0 1 -6,-6
-                          v-36
-                          a6,6 0 0 1 6,-6z"/>
+        android:strokeWidth="1.2"
+        android:strokeColor="#22FFFFFF"
+        android:pathData="M30,22h48c4.4,0 8,3.6 8,8v48c0,4.4 -3.6,8 -8,8h-48c-4.4,0 -8,-3.6 -8,-8v-48c0,-4.4 3.6,-8 8,-8z" />
 
-    <!-- Screen -->
+    <!-- Soft, clean radial glow centered behind the play icon -->
     <path
-        android:fillColor="#E50914"
-        android:pathData="M26,28 h56 a4,4 0 0 1 4,4 v28 a4,4 0 0 1 -4,4 h-56 a4,4 0 0 1 -4,-4 v-28 a4,4 0 0 1 4,-4z"/>
+        android:pathData="M14,14h80v80h-80z">
+        <aapt:attr name="android:fillColor">
+            <gradient
+                android:centerX="54"
+                android:centerY="54"
+                android:gradientRadius="36"
+                android:type="radial">
+                <item android:offset="0.0" android:color="#33E50914" />
+                <item android:offset="1.0" android:color="#00000000" />
+            </gradient>
+        </aapt:attr>
+    </path>
 
-    <!-- Play Button -->
+    <!-- Ultra-clean, minimal play icon with a vibrant crimson to coral gradient -->
     <path
+        android:pathData="M42,39 C42,36.3 44.9,34.6 47.3,36 L72.7,50.7 C75.1,52.1 75.1,55.6 72.7,57 L47.3,71.7 C44.9,73.1 42,71.4 42,68.6 Z">
+        <aapt:attr name="android:fillColor">
+            <gradient
+                android:startX="42"
+                android:startY="54"
+                android:endX="73"
+                android:endY="54"
+                android:type="linear">
+                <item android:offset="0.0" android:color="#FFFF3E5E" />
+                <item android:offset="1.0" android:color="#FFE50914" />
+            </gradient>
+        </aapt:attr>
+    </path>
+
+    <!-- Diagonal reflection sweep (subtle high-end polish) -->
+    <path
+        android:pathData="M8,8 L100,8 L8,100 Z"
         android:fillColor="#FFFFFF"
-        android:pathData="M45,39 L45,57 L63,48 Z"/>
+        android:fillAlpha="0.02" />
 
 </vector>
