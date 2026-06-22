@@ -57,6 +57,7 @@ class LauncherHomeFragment : Fragment() {
     private lateinit var continueWatchingAdapter: ArrayObjectAdapter
     private var continueWatchingItems: List<ContinueWatchingItem> = emptyList()
     private var lastContentFocusTarget = ContentFocusTarget.SectionGrid
+    private var hasRequestedInitialFocus = false
 
     private enum class ContentFocusTarget {
         SectionGrid,
@@ -96,6 +97,7 @@ class LauncherHomeFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        hasRequestedInitialFocus = false
         setupGrid()
         setupContinueWatchingGrid()
         wireVerticalFocusNavigation()
@@ -231,6 +233,20 @@ class LauncherHomeFragment : Fragment() {
                 }
             },
         )
+        binding.launcherGrid.setOnChildViewHolderSelectedListener(
+            object : OnChildViewHolderSelectedListener() {
+                override fun onChildViewHolderSelected(
+                    parent: RecyclerView,
+                    child: RecyclerView.ViewHolder?,
+                    position: Int,
+                    subposition: Int,
+                ) {
+                    if (child != null) {
+                        scrollToSectionRow()
+                    }
+                }
+            },
+        )
     }
 
     private fun focusContinueWatchingRow() {
@@ -325,13 +341,19 @@ class LauncherHomeFragment : Fragment() {
             buildItem(state, BrowseSection.MOVIES, ContentType.MOVIE, lastUpdate),
             buildItem(state, BrowseSection.SERIES, ContentType.SERIES, lastUpdate),
         )
+        val gridHasFocus = gridBinding.launcherGrid.hasFocus()
         gridAdapter.clear()
         items.forEach { gridAdapter.add(it) }
         gridBinding.launcherGrid.post {
             val activeBinding = _binding ?: return@post
             if (gridAdapter.size() > 0) {
                 activeBinding.launcherGrid.selectedPosition = 0
-                activeBinding.launcherGrid.requestFocus()
+                if (!hasRequestedInitialFocus) {
+                    hasRequestedInitialFocus = true
+                    activeBinding.launcherGrid.requestFocus()
+                } else if (gridHasFocus) {
+                    activeBinding.launcherGrid.requestFocus()
+                }
             }
         }
     }
@@ -354,6 +376,8 @@ class LauncherHomeFragment : Fragment() {
             items.size,
         )
         val favoriteIds = state.favorites.map { it.id }.toSet()
+        val cwHasFocus = gridBinding.continueWatchingGrid.hasFocus()
+        val focusedPosition = gridBinding.continueWatchingGrid.selectedPosition
         continueWatchingAdapter.clear()
         items.forEach { item ->
             continueWatchingAdapter.add(
@@ -372,6 +396,13 @@ class LauncherHomeFragment : Fragment() {
                     type = BrowseItemType.ACTION,
                 ),
             )
+        }
+        if (cwHasFocus && continueWatchingAdapter.size() > 0) {
+            gridBinding.continueWatchingGrid.post {
+                val activeBinding = _binding ?: return@post
+                activeBinding.continueWatchingGrid.selectedPosition = focusedPosition.coerceAtMost(continueWatchingAdapter.size() - 1)
+                activeBinding.continueWatchingGrid.requestFocus()
+            }
         }
         wireSectionCardFocusDown()
     }
