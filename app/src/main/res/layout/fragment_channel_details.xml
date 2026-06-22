@@ -44,6 +44,8 @@
                 android:ellipsize="end"
                 android:maxLines="2"
                 android:textAppearance="@style/TextAppearance.TvIptv.DetailsTitle"
+                android:textAlignment="viewStart"
+                android:gravity="start"
                 tools:text="Bein Max 1 AR 240P" />
 
             <TextView
@@ -52,6 +54,8 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
                 android:textAppearance="@style/TextAppearance.TvIptv.DetailsSubtitle"
+                android:textAlignment="viewStart"
+                android:gravity="start"
                 tools:text="Sports · LIVE" />
 
             <TextView
@@ -62,6 +66,8 @@
                 android:ellipsize="end"
                 android:maxLines="4"
                 android:textAppearance="@style/TextAppearance.TvIptv.DetailsBody"
+                android:textAlignment="viewStart"
+                android:gravity="start"
                 android:visibility="gone"
                 tools:text="Channel description goes here."
                 tools:visibility="visible" />
@@ -81,7 +87,6 @@
                     android:focusableInTouchMode="true"
                     android:gravity="center"
                     android:minWidth="220dp"
-                    android:nextFocusRight="@id/details_favorite_button"
                     android:paddingHorizontal="28dp"
                     android:paddingVertical="14dp"
                     android:text="@string/watch_live"
@@ -98,7 +103,6 @@
                     android:focusableInTouchMode="true"
                     android:gravity="center"
                     android:minWidth="220dp"
-                    android:nextFocusLeft="@id/details_watch_button"
                     android:paddingHorizontal="28dp"
                     android:paddingVertical="14dp"
                     android:text="@string/add_favorite"

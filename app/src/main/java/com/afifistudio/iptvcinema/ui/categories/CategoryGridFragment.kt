@@ -91,6 +91,12 @@ class CategoryGridFragment : RowsSupportFragment() {
         super.onPause()
     }
 
+    override fun onDestroyView() {
+        renderedFingerprint = null
+        hasInitialFocus = false
+        super.onDestroyView()
+    }
+
     private fun wireChromeFocusBridge() {
         TvFocusCoordinator.wireLeanbackRowsUp(
             verticalGridView = verticalGridView,

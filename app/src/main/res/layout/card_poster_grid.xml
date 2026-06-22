@@ -78,5 +78,7 @@
         android:maxLines="2"
         android:minHeight="@dimen/card_poster_title_min_height"
         android:textAppearance="@style/TextAppearance.TvIptv.PosterGridTitle"
+        android:textAlignment="viewStart"
+        android:gravity="start"
         tools:text="فاميلي بيزنس - FHD" />
 </LinearLayout>

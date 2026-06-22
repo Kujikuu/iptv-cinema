@@ -9,6 +9,8 @@
         android:id="@+id/lb_details_description_title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:textAlignment="viewStart"
+        android:gravity="start"
         android:textAppearance="@style/TextAppearance.TvIptv.HeroTitle" />
 
     <TextView
@@ -16,6 +18,8 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
+        android:textAlignment="viewStart"
+        android:gravity="start"
         android:textAppearance="@style/TextAppearance.TvIptv.CardSubtitle" />
 
     <TextView
@@ -23,6 +27,8 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
+        android:textAlignment="viewStart"
+        android:gravity="start"
         android:textAppearance="@style/TextAppearance.TvIptv.CardSubtitle"
         android:visibility="gone" />
 </LinearLayout>

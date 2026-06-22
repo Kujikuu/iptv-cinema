@@ -102,6 +102,8 @@
                         android:includeFontPadding="false"
                         android:maxLines="1"
                         android:textAppearance="@style/TextAppearance.TvIptv.LauncherTitle"
+                        android:textAlignment="viewStart"
+                        android:gravity="start"
                         tools:text="Live TV" />
                 </LinearLayout>
 
@@ -116,6 +118,8 @@
                     android:maxLines="1"
                     android:textAppearance="@style/TextAppearance.TvIptv.LauncherMeta"
                     android:textColor="@color/on_surface_secondary"
+                    android:textAlignment="viewStart"
+                    android:gravity="start"
                     tools:text="+12706 Channels" />
             </LinearLayout>
 

@@ -152,9 +152,9 @@ class CategoryDetailFragment : Fragment() {
             setNumColumns(columns)
             verticalSpacing = rowSpacing
             clipChildren = false
-            clipToPadding = true
+            clipToPadding = false
             adapter = bridgeAdapter
-            setPadding(paddingLeft, 0, paddingRight, bottomPadding)
+            setPadding(paddingLeft, paddingTop, paddingRight, bottomPadding)
             setWindowAlignment(BaseGridView.WINDOW_ALIGN_LOW_EDGE)
             setWindowAlignmentOffset(0)
             setItemAlignmentOffset(0)
@@ -310,6 +310,7 @@ class CategoryDetailFragment : Fragment() {
         super.onDestroyView()
         renderedChannelIds = emptyList()
         renderedFavoriteIds = emptySet()
+        hasInitialFocus = false
         _binding = null
     }
 

@@ -61,6 +61,7 @@ class CategoryCardPresenter : Presenter() {
 
         root.setOnFocusChangeListener { view, hasFocus ->
             CardFocusHelper.applyCategoryFocus(view, binding.categoryAccentBar, binding.categoryHint, hasFocus)
+            binding.categoryCount.visibility = if (hasFocus) View.GONE else (if (card.channelCount != null) View.VISIBLE else View.GONE)
         }
     }
 
@@ -70,6 +71,7 @@ class CategoryCardPresenter : Presenter() {
         binding.categoryPreview.setImageDrawable(null)
         binding.categoryName.text = null
         binding.categoryCount.text = null
+        binding.categoryCount.visibility = View.VISIBLE
         binding.categoryTypeBadge.isVisible = false
         binding.categoryHint.visibility = View.INVISIBLE
         binding.categoryAccentBar.setBackgroundResource(R.drawable.category_accent_bar_muted)

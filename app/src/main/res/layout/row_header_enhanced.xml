@@ -16,6 +16,8 @@
         android:includeFontPadding="false"
         android:maxLines="1"
         android:textAppearance="@style/TextAppearance.TvIptv.RowHeader"
+        android:textAlignment="viewStart"
+        android:gravity="start"
         tools:text="Movies" />
 
     <TextView
@@ -27,6 +29,8 @@
         android:includeFontPadding="false"
         android:maxLines="1"
         android:textAppearance="@style/TextAppearance.TvIptv.RowHeaderSubtitle"
+        android:textAlignment="viewStart"
+        android:gravity="start"
         android:visibility="gone"
         tools:text="19808 titles"
         tools:visibility="visible" />

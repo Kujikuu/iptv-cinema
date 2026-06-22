@@ -19,6 +19,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/settings_title"
+            android:textAlignment="viewStart"
+            android:gravity="start"
             android:textAppearance="@style/TextAppearance.TvIptv.SettingsTitle" />
 
         <TextView
@@ -26,6 +28,8 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="32dp"
             android:text="@string/settings_source_header"
+            android:textAlignment="viewStart"
+            android:gravity="start"
             android:textAppearance="@style/TextAppearance.TvIptv.RowHeaderSubtitle" />
 
         <TextView
@@ -37,6 +41,8 @@
             android:focusable="false"
             android:paddingHorizontal="20dp"
             android:paddingVertical="16dp"
+            android:textAlignment="viewStart"
+            android:gravity="start|center_vertical"
             android:textAppearance="@style/TextAppearance.TvIptv.SettingsItem"
             tools:text="Active: My IPTV" />
 
@@ -48,6 +54,8 @@
             android:focusable="false"
             android:paddingHorizontal="20dp"
             android:paddingVertical="8dp"
+            android:textAlignment="viewStart"
+            android:gravity="start|center_vertical"
             android:textAppearance="@style/TextAppearance.TvIptv.SettingsItem"
             tools:text="Last refreshed: 2 days ago" />
 
@@ -62,6 +70,8 @@
             android:paddingHorizontal="20dp"
             android:paddingVertical="16dp"
             android:text="@string/settings_refresh_interval"
+            android:textAlignment="viewStart"
+            android:gravity="start|center_vertical"
             android:textAppearance="@style/TextAppearance.TvIptv.SettingsItem"
             tools:text="Auto-refresh: Every 2 days" />
 
@@ -76,6 +86,8 @@
             android:paddingHorizontal="20dp"
             android:paddingVertical="16dp"
             android:text="@string/settings_refresh"
+            android:textAlignment="viewStart"
+            android:gravity="start|center_vertical"
             android:textAppearance="@style/TextAppearance.TvIptv.SettingsItem" />
 
         <TextView
@@ -89,6 +101,8 @@
             android:paddingHorizontal="20dp"
             android:paddingVertical="16dp"
             android:text="@string/settings_switch_source"
+            android:textAlignment="viewStart"
+            android:gravity="start|center_vertical"
             android:textAppearance="@style/TextAppearance.TvIptv.SettingsItem"
             tools:text="Switch source" />
 
@@ -103,6 +117,8 @@
             android:paddingHorizontal="20dp"
             android:paddingVertical="16dp"
             android:text="@string/settings_delete_source"
+            android:textAlignment="viewStart"
+            android:gravity="start|center_vertical"
             android:textAppearance="@style/TextAppearance.TvIptv.SettingsItem" />
 
         <TextView
@@ -116,6 +132,8 @@
             android:paddingHorizontal="20dp"
             android:paddingVertical="16dp"
             android:text="@string/settings_add_source"
+            android:textAlignment="viewStart"
+            android:gravity="start|center_vertical"
             android:textAppearance="@style/TextAppearance.TvIptv.SettingsItem" />
 
         <TextView
@@ -123,6 +141,8 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="28dp"
             android:text="@string/settings_library_header"
+            android:textAlignment="viewStart"
+            android:gravity="start"
             android:textAppearance="@style/TextAppearance.TvIptv.RowHeaderSubtitle" />
 
         <TextView
@@ -136,6 +156,8 @@
             android:paddingHorizontal="20dp"
             android:paddingVertical="16dp"
             android:text="@string/settings_continue_watching"
+            android:textAlignment="viewStart"
+            android:gravity="start|center_vertical"
             android:textAppearance="@style/TextAppearance.TvIptv.SettingsItem" />
 
         <TextView
@@ -149,6 +171,8 @@
             android:paddingHorizontal="20dp"
             android:paddingVertical="16dp"
             android:text="@string/settings_favorites"
+            android:textAlignment="viewStart"
+            android:gravity="start|center_vertical"
             android:textAppearance="@style/TextAppearance.TvIptv.SettingsItem" />
 
         <TextView
@@ -162,6 +186,8 @@
             android:paddingHorizontal="20dp"
             android:paddingVertical="16dp"
             android:text="@string/settings_clear_history"
+            android:textAlignment="viewStart"
+            android:gravity="start|center_vertical"
             android:textAppearance="@style/TextAppearance.TvIptv.SettingsItem" />
 
         <TextView
@@ -169,6 +195,8 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="28dp"
             android:text="@string/settings_playback_header"
+            android:textAlignment="viewStart"
+            android:gravity="start"
             android:textAppearance="@style/TextAppearance.TvIptv.RowHeaderSubtitle" />
 
         <TextView
@@ -182,6 +210,8 @@
             android:paddingHorizontal="20dp"
             android:paddingVertical="16dp"
             android:text="@string/settings_autoplay_next_episode_on"
+            android:textAlignment="viewStart"
+            android:gravity="start|center_vertical"
             android:textAppearance="@style/TextAppearance.TvIptv.SettingsItem" />
 
         <TextView
@@ -189,6 +219,8 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="28dp"
             android:text="@string/settings_about_header"
+            android:textAlignment="viewStart"
+            android:gravity="start"
             android:textAppearance="@style/TextAppearance.TvIptv.RowHeaderSubtitle" />
 
         <TextView
@@ -198,6 +230,8 @@
             android:layout_marginTop="12dp"
             android:paddingHorizontal="20dp"
             android:paddingVertical="16dp"
+            android:textAlignment="viewStart"
+            android:gravity="start|center_vertical"
             android:textAppearance="@style/TextAppearance.TvIptv.SettingsItem"
             tools:text="Version 1.0.0" />
     </LinearLayout>

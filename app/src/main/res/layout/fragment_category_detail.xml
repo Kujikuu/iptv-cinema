@@ -44,6 +44,8 @@
             android:includeFontPadding="false"
             android:maxLines="1"
             android:textAppearance="@style/TextAppearance.TvIptv.RowHeader"
+            android:textAlignment="viewStart"
+            android:gravity="start"
             tools:text="ARABIC | 2026 | عربي" />
 
         <TextView
@@ -55,6 +57,8 @@
             android:includeFontPadding="false"
             android:maxLines="1"
             android:textAppearance="@style/TextAppearance.TvIptv.RowHeaderSubtitle"
+            android:textAlignment="viewStart"
+            android:gravity="start|center_vertical"
             tools:text="26 titles" />
     </LinearLayout>
 </FrameLayout>
