@@ -50,12 +50,10 @@ class SeriesDetailsFragment : RowsSupportFragment() {
 
     private val contentFocusHandler = object : ContentFocusHandler {
         override fun requestInitialFocus(): Boolean {
-            view?.post {
-                if ((adapter?.size() ?: 0) > 0) {
-                    setSelectedPosition(0, false)
-                }
-            }
-            return true
+            val grid = verticalGridView ?: return false
+            if (adapter == null || adapter.size() == 0) return false
+            setSelectedPosition(0, false)
+            return grid.requestFocus()
         }
 
         override fun canFocusUpToChrome(): Boolean = selectedPosition == 0
@@ -166,7 +164,10 @@ class SeriesDetailsFragment : RowsSupportFragment() {
             highlightEpisodeId = null
         } else if (!hasInitialFocus && rowsAdapter.size() > 0) {
             hasInitialFocus = true
-            view?.post { setSelectedPosition(0, false) }
+            view?.post {
+                setSelectedPosition(0, false)
+                verticalGridView?.requestFocus()
+            }
         }
     }
 

@@ -62,8 +62,10 @@ class CategoryDetailFragment : Fragment() {
 
     private val contentFocusHandler = object : ContentFocusHandler {
         override fun requestInitialFocus(): Boolean {
-            requestGridFocus()
-            return true
+            if (_binding == null || gridAdapter.size() == 0) return false
+            val grid = binding.categoryDetailGrid
+            grid.selectedPosition = 0
+            return grid.requestFocus()
         }
 
         override fun canFocusUpToChrome(): Boolean =
@@ -110,10 +112,24 @@ class CategoryDetailFragment : Fragment() {
     }
 
     private fun requestGridFocus() {
-        binding.categoryDetailGrid.post {
+        val grid = binding.categoryDetailGrid
+        grid.post {
             if (_binding == null || gridAdapter.size() == 0) return@post
-            binding.categoryDetailGrid.selectedPosition = 0
-            binding.categoryDetailGrid.requestFocus()
+            grid.selectedPosition = 0
+            if (grid.childCount > 0) {
+                grid.requestFocus()
+            } else {
+                grid.addOnLayoutChangeListener(object : View.OnLayoutChangeListener {
+                    override fun onLayoutChange(
+                        v: View?,
+                        left: Int, top: Int, right: Int, bottom: Int,
+                        oldLeft: Int, oldTop: Int, oldRight: Int, oldBottom: Int
+                    ) {
+                        grid.removeOnLayoutChangeListener(this)
+                        grid.requestFocus()
+                    }
+                })
+            }
         }
     }
 
