@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <style name="Theme.TvIptv" parent="Theme.AppCompat.Leanback.Browse">
+    <style name="Theme.IptvCinema" parent="Theme.AppCompat.Leanback.Browse">
         <item name="android:colorPrimary">@color/primary</item>
         <item name="android:colorPrimaryDark">@color/primary_dark</item>
         <item name="android:colorAccent">@color/accent</item>
@@ -11,10 +11,10 @@
         <item name="android:colorBackground">@color/background</item>
         <item name="android:textColorPrimary">@color/on_surface</item>
         <item name="android:textColorSecondary">@color/on_surface_secondary</item>
-        <item name="guidedStepTheme">@style/Theme.TvIptv.GuidedStep</item>
+        <item name="guidedStepTheme">@style/Theme.IptvCinema.GuidedStep</item>
     </style>
 
-    <style name="Theme.TvIptv.GuidedStep" parent="Theme.AppCompat.Leanback.GuidedStep">
+    <style name="Theme.IptvCinema.GuidedStep" parent="Theme.AppCompat.Leanback.GuidedStep">
         <item name="android:colorPrimary">@color/primary</item>
         <item name="android:colorAccent">@color/accent</item>
         <item name="colorPrimary">@color/primary</item>
@@ -24,7 +24,7 @@
         <item name="android:textColorSecondary">@color/on_surface_secondary</item>
     </style>
 
-    <style name="Theme.TvIptv.Player" parent="Theme.AppCompat.Leanback">
+    <style name="Theme.IptvCinema.Player" parent="Theme.AppCompat.Leanback">
         <item name="android:windowBackground">@android:color/black</item>
         <item name="android:windowFullscreen">true</item>
     </style>

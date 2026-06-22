@@ -7,11 +7,11 @@ plugins {
 }
 
 android {
-    namespace = "com.tviptv.app"
+    namespace = "com.afifistudio.iptvcinema"
     compileSdk = 35
 
     defaultConfig {
-        applicationId = "com.tviptv.app"
+        applicationId = "com.afifistudio.iptvcinema"
         minSdk = 24
         targetSdk = 35
         versionCode = 1
